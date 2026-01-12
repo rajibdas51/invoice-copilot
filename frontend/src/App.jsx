@@ -1,10 +1,37 @@
-import React from "react";
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import {Toaster} from 'react-hot-toast';
+import LandingPage from './pages/LandingPage/LandingPage';
+import SignUp from './pages/Auth/SignUp';
+import Login from './pages/Auth/Login';
+
 
 const App = () => {
 
   return(
     <div>
-      <h1 className="text-2xl text-green-700 text-center"> Hello world</h1>
+   
+   <Router>
+    <Routes>
+      <Route path='/' element={<LandingPage/>} />
+      <Route path='/signup' element={<SignUp/>}/>
+      <Route path='/login' element={<Login/>}/>
+
+      {/* Catch all  Routes */ }
+      <Route path='*' element={<Navigate to='/' replace/>}/>
+    </Routes>
+   </Router>
+
+   <Toaster 
+    toastOptions={
+      {
+        className:"",
+        style:{
+          fontSize:"13px",
+        }
+      }
+    }
+   
+   />
     </div>
   )
 }
