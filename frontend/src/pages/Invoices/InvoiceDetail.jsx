@@ -6,4 +6,4 @@ const InvoiceDetail = () => {
   )
 }
 
-export default InvoiceDetail
+export default InvoiceDetail;
