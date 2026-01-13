@@ -1,8 +1,12 @@
-import React from 'react'
+
+import Header from '../../components/landing/Header';
 
 const LandingPage = () => {
   return (
-    <div>LandingPage</div>
+    <div className='bg-[#ffffff] text-gray-600'>
+      
+      <Header/>
+    </div>
   )
 }
 
