@@ -1,16 +1,18 @@
 import { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {FileText, Menu, X} from 'lucide-react';
+import ProfileDropdown from '../layout/ProfileDropdown';
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [profileDropdownMenuOpen, setProfileDropdownMenuOpen] = useState(false);
-    const isAuthenticated = false; 
+    const isAuthenticated = true; 
     const user = {name:"Rajib", email:"rajib@gmail.com"}
     
     const logout =() =>{
         console.log("Logged out");
     }
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,7 +45,19 @@ const Header = () => {
                 </div>
                 <div className='hidden lg:flex lg:items-center lg:space-x-4'>
                   
-                  {isAuthenticated? <>Get Started</>:<>
+                  {isAuthenticated? 
+                  (
+                    <ProfileDropdown
+                    isOpen ={profileDropdownMenuOpen}
+                    onToggle= {(e)=> {
+                      e.stopPropagation();
+                      setProfileDropdownMenuOpen(!profileDropdownMenuOpen)}}
+                    avatar ={user?.avatar || ""}
+                    companyName ={user?.companyName || user?.name || "User"}
+                    email={user?.email || ""}
+                    onLogout ={logout}
+                    />
+                  ):<>
                     <Link to="/login" className=' text-black hover:text-gray-900 font-medium transition-colors duration-200'>Login</Link>
                     <Link to="/signup" className='bg-gradient-to-r from-blue-800 to-blue-600 hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'>Sign Up</Link>
                   </>}
