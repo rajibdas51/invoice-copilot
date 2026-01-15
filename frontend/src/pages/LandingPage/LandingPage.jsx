@@ -1,11 +1,16 @@
 
 import Header from '../../components/landing/Header';
+import Hero from '../../components/landing/Hero';
 
 const LandingPage = () => {
   return (
     <div className='bg-[#ffffff] text-gray-600'>
       
       <Header/>
+      {/* Hero Section */}
+      <main>
+        <Hero/>
+      </main>
     </div>
   )
 }
