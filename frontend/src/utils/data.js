@@ -25,3 +25,32 @@ export const FEATURES =[
     },
 
 ]
+
+
+
+export const TESTIMONIALS =[
+    {
+        quote:"AI Invoice Generator has transformed the way I handle invoicing. The AI-powered invoice creation is incredibly accurate and saves me hours of work each week.",
+        author:"Jane Doe",
+        title:"Freelance Designer",
+        avatar:"https://randomuser.me/api/portraits/women/44.jpg"
+    },
+    {
+        quote:"The smart payment reminders have significantly improved my cash flow. Clients respond better to the AI-generated emails, and I get paid faster",
+        author:"John Smith",
+        title:"Small Business Owner",
+        avatar:"https://randomuser.me/api/portraits/men/32.jpg"
+    },
+    {
+        quote:"The AI-powered dashboard insights provide valuable information about my business finances. It's like having a personal financial advisor at my fingertips.",
+        author:"Alex Johnson",
+        title:"Small Business Owner",
+        avatar:"https://randomuser.me/api/portraits/men/22.jpg"
+    },
+    {
+        quote:"Managing invoices has never been easier. The intuitive interface and AI features make it simple to stay organized and on top of my billing.",
+        author:"Sarah Williams",
+        title:"Freelance Writer",
+        avatar:"https://randomuser.me/api/portraits/women/68.jpg"
+    }
+]
