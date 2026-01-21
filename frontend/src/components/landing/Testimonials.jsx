@@ -7,27 +7,27 @@ const Testimonials = () => {
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
     <div className="text-center mb-16">
       <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">What Our Customers Say</h2>
-      <p className="mt-4 text-lg text-gray-600">We are trusted by thousands of small businesses.</p>
+      <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">We are trusted by thousands of small businesses.</p>
     </div>
 
-    <div className="">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {TESTIMONIALS.map((testimonial, index) => (
-        <div key={index} className="">
-          <div className="">
-            <Quote className="" />
+        <div key={index} className="bg-gray-50  rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+          <div className="absolute -top-4 left-8 w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-full flex items-center justify-center shadow-md">
+            <Quote className="w-5 h-5" />
           </div>
 
-          <p className="">{testimonial.quote}</p>
+          <p className="text-gray-700 mb-6 leading-relaxed italic text-lg">{testimonial.quote}</p>
 
-          <div className="">
+          <div className="mt-8 flex items-center space-x-4">
             <img
               src={testimonial.avatar}
               alt={testimonial.author}
-              className=""
+              className="w-12 h-12 rounded-full object-cover border border-gray-100"
             />
-            <div className="">
-              <p className="">{testimonial.author}</p>
-              <p className="">{testimonial.title}</p>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-900">{testimonial.author}</p>
+              <p className="text-gray-500 text-sm ">{testimonial.title}</p>
             </div>
           </div>
         </div>
