@@ -1,4 +1,5 @@
 
+import Faqs from '../../components/landing/Faqs';
 import Features from '../../components/landing/Features';
 import Header from '../../components/landing/Header';
 import Hero from '../../components/landing/Hero';
@@ -15,6 +16,7 @@ const LandingPage = () => {
         <Hero/>
         <Features/>
         <Testimonials/>
+        <Faqs/>
       </main>
     </div>
   )
