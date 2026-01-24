@@ -1,8 +1,42 @@
-import React from 'react'
+import React, {useState} from 'react';
+import {ChevronDownIcon} from "lucide-react";
+import {FAQS} from "../../utils/data";
+import FaqItem from './FaqItem';
 
 const Faqs = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const handleClick = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  }
+
   return (
-    <div>Faqs</div>
+    <section id='faq' className='py-20 lg:py-28 bg-white'>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">Everything you need to know about our AI Invoice Generator and Billing</p>  
+             </div>
+             <div className="space-y-4">
+             
+                {
+                  FAQS?.map((faq, index)  =>( 
+                     
+                      <FaqItem
+                      key={index}
+                      faq={faq}
+                      isOpen={openIndex === index}
+                      onClick={() => handleClick(index)}
+                      />                  
+                  
+                   ) )
+                }
+             </div>
+        </div>
+    </section>
   )
 }
 
