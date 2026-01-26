@@ -8,6 +8,7 @@ const protect = async(req,res,next)=>{
         try{
             // get token from header
             token = req.headers.authorization.split('')[1];
+
             
             // verify token
             const decoded = jwt.verify(token,process.env.JWT_SECRET);
