@@ -3,7 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import {ConnectDB} from './config/db.js';
-import authRoutes from './routes/authRoutes.js'
+import authRouter from './routes/authRoutes.js'
+import {  errorHandler } from './middlewares/errorMiddleware.js';
+
 dotenv.config();
 
 // app config
@@ -26,12 +28,17 @@ app.use(express.json());
 
 
 // Routes
-app.use("/api/auth",authRoutes)
-app.use('/', (req, res) => {
+app.use("/api/auth",authRouter)
+app.get('/', (req, res) => {
     res.send("API is running...");
 });
-// start Server
 
+// Error Handling Middleware
+
+app.use(errorHandler);
+
+
+// start Server
 
 
 app.listen(PORT,()=>console.log(`Server running on port ${PORT}`));

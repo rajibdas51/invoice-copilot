@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import User from '../models/User'
+import User from '../models/User.js'
 
 // Helper: Generate JWT
 const generateToken = (id)=>{
@@ -9,21 +9,36 @@ const generateToken = (id)=>{
 // @desc Register new user
 // @route POST /api/auth/register
 // @access Public
+const registerUser = async (req, res) => {
+  const { name, email, password } = req.body;
 
-export const registerUser = async (req,res)=>{
-   const {name, email,password} = req.body;
-   try{
-   
-   } catch(error){
-       res.status(500).json({message:"Server error"})
-   }
-}
+  if (!name || !email || !password) {
+    res.status(400);
+    throw new Error('Please fill all the fields!');
+  }
+
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
+  const user = await User.create({ name, email, password });
+
+  res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    token: generateToken(user._id),
+  });
+};
+
 
 // @desc login  user
 // @route POST /api/auth/login
   
 // @access Public
-export const loginUser = async (req, res) =>{
+ const loginUser = async (req, res) =>{
    const {name, email,password} = req.body;
    try{
    
@@ -39,7 +54,7 @@ export const loginUser = async (req, res) =>{
   
 // @access Private
 
-export const getMe = async (req, res)=>{
+const getMe = async (req, res)=>{
     try{
    
    } catch(error){
@@ -55,10 +70,12 @@ export const getMe = async (req, res)=>{
   
 // @access Private
 
-export const updateUser = async (req, res)=>{
+const updateUserProfile = async (req, res)=>{
     try{
    
    } catch(error){
        res.status(500).json({message:"Server error"})
    }
 }
+
+export {registerUser,loginUser,getMe, updateUserProfile};
