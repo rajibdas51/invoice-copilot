@@ -153,6 +153,12 @@ const updateInvoice = async (req, res) => {
 // @access  Private
 const deleteInvoice = async (req, res) => {
   try {
+    const invoice = await Invoice.findByIdAndDelete(req.params.id);
+    if (!invoice) {
+      res.status(404);
+      throw new Error("Invoice not found");
+    }
+    res.json({ message: "Invoice deleted successfully" });
   } catch (error) {
     res.status(500);
     throw new Error("Error deleting invoice");
