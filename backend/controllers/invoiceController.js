@@ -72,7 +72,19 @@ const getInvoices = async (req, res) => {
 
 const getInvoiceById = async (req, res) => {
   try {
-  } catch (error) {}
+    const invoice = await Invoice.findById(req.params.id).populate(
+      "user",
+      "name email",
+    );
+    if (!invoice) {
+      res.status(404);
+      throw new Error("Invoice not found");
+    }
+    res.json(invoice);
+  } catch (error) {
+    res.status(500);
+    throw new Error("Error fetching invoice");
+  }
 };
 // @desc    Update an invoice
 // @route   PUT /api/invoices/:id
