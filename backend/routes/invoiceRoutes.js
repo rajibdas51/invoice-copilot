@@ -11,7 +11,8 @@ import protect from "../middlewares/authMiddleware.js";
 
 const invoiceRouter = express.Router();
 
-invoiceRouter.post("/", protect, createInvoice).get(protect, getInvoices);
+invoiceRouter.route("/").post(protect, createInvoice).get(protect, getInvoices);
+
 invoiceRouter
   .route("/:id")
   .get(protect, getInvoiceById)

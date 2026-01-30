@@ -1,9 +1,10 @@
-import Invoice from "../models/invoiceModel.js";
+import Invoice from "../models/Invoice.js";
 
 // @desc    Create a new invoice
 // @route   POST /api/invoices
 // @access  Private
-export const createInvoice = async (req, res) => {
+
+const createInvoice = async (req, res) => {
   try {
     const user = req.user;
     const {
@@ -54,8 +55,11 @@ export const createInvoice = async (req, res) => {
 // @desc    Get all invoices for the logged-in user
 // @route   GET /api/invoices
 // @access  Private
-export const getInvoices = async (req, res) => {
+
+const getInvoices = async (req, res) => {
   try {
+    const invoices = await Invoice.find().populate("user", "name email");
+    res.json(invoices);
   } catch (error) {
     res.status(500);
     throw new Error("Error fetching invoices");
@@ -65,14 +69,16 @@ export const getInvoices = async (req, res) => {
 // @desc    Get a single invoice by ID
 // @route   GET /api/invoices/:id
 // @access  Private
-export const getInvoiceById = async (req, res) => {
+
+const getInvoiceById = async (req, res) => {
   try {
   } catch (error) {}
 };
 // @desc    Update an invoice
 // @route   PUT /api/invoices/:id
 // @access  Private
-export const updateInvoice = async (req, res) => {
+
+const updateInvoice = async (req, res) => {
   try {
   } catch (error) {
     res.status(500);
@@ -83,10 +89,18 @@ export const updateInvoice = async (req, res) => {
 // @desc    Delete an invoice
 // @route   DELETE /api/invoices/:id
 // @access  Private
-export const deleteInvoice = async (req, res) => {
+const deleteInvoice = async (req, res) => {
   try {
   } catch (error) {
     res.status(500);
     throw new Error("Error deleting invoice");
   }
+};
+
+export {
+  createInvoice,
+  getInvoices,
+  getInvoiceById,
+  updateInvoice,
+  deleteInvoice,
 };
