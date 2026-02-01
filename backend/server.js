@@ -6,7 +6,7 @@ import { ConnectDB } from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import invoiceRouter from "./routes/invoiceRoutes.js";
 import { errorHandler } from "./middlewares/errorMiddleware.js";
-
+import aiRouter from "./routes/aiRoutes.js";
 dotenv.config();
 
 // app config
@@ -32,9 +32,7 @@ app.use(
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/invoices", invoiceRouter);
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+app.use("/api/ai", aiRouter);
 
 // Error Handling Middleware
 app.use(errorHandler);
