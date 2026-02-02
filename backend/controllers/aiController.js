@@ -1,23 +1,20 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-import Invoice from "../models/invoiceModel.js";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_GENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const parseInvoiceFromText = async (req, res) => {
   const { text } = req.body;
+
   if (!text) {
     res.status(400);
     throw new Error("Text is required");
   }
+
   try {
-    const prompt = `you are an expert at invoice data extraction. Analyze the follwing text and extract the relevant information to create an invoice. The output MUST be a vaild JSON object
+    const prompt = `you are an expert at invoice data extraction. Analyze the following text and extract the relevant information to create an invoice. The output MUST be a valid JSON object
     
     The JSON object should have the following structure:
     { 
-
     "clientName":"string",
     "email":"string",
     "address":"string",
@@ -25,7 +22,7 @@ const parseInvoiceFromText = async (req, res) => {
           {
              "name":"string",
              "quantity":number,
-             "unitprice":number}
+             "unitPrice":number}
     ]
     }
 
@@ -34,11 +31,26 @@ const parseInvoiceFromText = async (req, res) => {
     ${text}
     --- TEXT END ---
 
-
     Extract the data and provide ONLY the JSON object as output without any additional text or explanation.
     `;
+
+    console.log("Calling Gemini API...");
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    const parsedData = JSON.parse(responseText);
+
+    res.status(200).json(parsedData);
   } catch (error) {
-    console.error("Error parsing invoice with AI:", error);
+    console.error("Error details:", error);
+    console.error("Error message:", error.message);
     res.status(500);
     throw new Error("Failed to parse invoice data from text");
   }

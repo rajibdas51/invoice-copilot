@@ -1,13 +1,15 @@
-import dotenv from "dotenv";
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
 import path from "path";
+import morgan from "morgan";
+
 import { ConnectDB } from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import invoiceRouter from "./routes/invoiceRoutes.js";
-import { errorHandler } from "./middlewares/errorMiddleware.js";
 import aiRouter from "./routes/aiRoutes.js";
-dotenv.config();
+import { errorHandler } from "./middlewares/errorMiddleware.js";
 
 // app config
 const app = express();
@@ -19,7 +21,8 @@ ConnectDB();
 // Middleware to parse JSON and URL-encoded requests (BEFORE CORS)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+// Use morgan middleware
+app.use(morgan("dev"));
 // Middleware to handle CORS (AFTER body parsers)
 app.use(
   cors({

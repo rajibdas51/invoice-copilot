@@ -4,7 +4,7 @@ import {
   generateReminderEmail,
   getDashboardSummary,
 } from "../controllers/aiController.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import protect from "../middlewares/authMiddleware.js";
 const aiRouter = express.Router();
 
 aiRouter.post("/parse-text", protect, parseInvoiceFromText);
