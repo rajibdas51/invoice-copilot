@@ -93,13 +93,66 @@ const generateReminderEmail = async (req, res) => {
 
 const getDashboardSummary = async (req, res) => {
   try {
-    try {
-    } catch (error) {
-      console.error("Error generating dashboard summary with AI:", error);
-      res.status(500);
-      throw new Error("Failed to generate dashboard summary with AI");
+    const invoices = await Invoice.find({ user: req.user._id });
+    if (invoices.length === 0) {
+      res.status(200);
+      throw new Error("No invoices found for the user");
     }
-  } catch (error) {}
+
+    // Process and summarize invoice data
+    const totalInvoices = invoices.length;
+    const paidInvoices = invoices.filter((inv) => inv.status === "Paid");
+    const unpaidInvoices = invoices.filter((inv) => inv.status !== "Paid");
+    const totalRevenue = invoices.reduce((sum, inv) => sum + inv.total, 0);
+    const totalOutstanding = unpaidInvoices.reduce(
+      (sum, inv) => sum + inv.total,
+      0,
+    );
+    const dataSummary = `
+      -Total number of invoices: ${totalInvoices}
+      -Total paid invoices: ${paidInvoices.length}
+      -Total unpaid/pending invoices: ${unpaidInvoices.length}
+      -Total revenue: $${totalRevenue.toFixed(2)}
+      -Total outstanding amount from unpaid/pending invoices: $${totalOutstanding.toFixed(2)}
+      -Recent invoices(last 5):
+      ${invoices
+        .slice(0, 5)
+        .map(
+          (inv) =>
+            `Invoice #${inv.invoiceNumber} for ${inv.total.toFixed(2)} with status: ${inv.status}`,
+        )
+        .join(",  ")}  
+    `;
+
+    const prompt = ` You are a professional and insightful financial analyst for a small business owner.based on the following summary of their invoice data, provide 2-3 concise and actionable insights.eachinsight should be a short string in a JSON array.
+    The insights should be encouraging and helpful. Do not just repeat the data.
+    For example, if there is a high number of unpaid invoices, suggest strategies to improve payment collection. Like, sending reminder emails or offering early payment discounts. If revenue is growing, suggest ways to maintain that growth.
+
+    Data Summary:
+    ${dataSummary}
+    
+    Return your response as a valid JSON object with a single key "insights" containing an array of strings.
+    Example format: {"insights":["Your revenue is looking strong this month! ","You have 5 overdue invoices. Consider sending reminders to get paid faster. "]}
+
+  
+    `;
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
+    });
+    const result = await model.generateContent(prompt);
+    const responseText = await result.response.text();
+    const parsedInsights = JSON.parse(responseText);
+
+    res.status(200).json({ insights: parsedInsights.insights });
+  } catch (error) {
+    console.error("Error generating dashboard summary with AI:", error);
+    res.status(500);
+    throw new Error("Failed to generate dashboard summary with AI");
+  }
 };
 
 export { parseInvoiceFromText, generateReminderEmail, getDashboardSummary };
