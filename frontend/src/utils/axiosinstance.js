@@ -13,9 +13,9 @@ const axiosInstance = axios.create({
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -35,7 +35,7 @@ axiosInstance.interceptors.response.use(
       console.warn("Session expired. Logging out...");
 
       // Clear the local storage so the app doesn't try to use the bad token again
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
 
       // Redirect to login page

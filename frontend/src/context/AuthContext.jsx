@@ -17,7 +17,7 @@ export const AuthProvider = ({children}) =>{
 
      const checkAuthStatus = async () =>{
      try {
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("token");
         const userStr = localStorage.getItem("user");
         if(token && userStr){
             const userData = JSON.parse(userStr);
@@ -38,7 +38,10 @@ export const AuthProvider = ({children}) =>{
 
    
     const login = (userData, token)=>{
-
+      localStorage.setItem("token",token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
     }
 
     const logout = () =>{
