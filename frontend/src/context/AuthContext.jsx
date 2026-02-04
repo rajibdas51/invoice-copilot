@@ -2,6 +2,7 @@ import React,{createContext,useContext, useState, useEffect} from 'react';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth =() =>{
     const context = useContext(AuthContext);
     if(!context){
@@ -45,11 +46,18 @@ export const AuthProvider = ({children}) =>{
     }
 
     const logout = () =>{
-
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("refreshToken");
+        setUser(null);
+        setIsAuthenticated(false);
+        window.location.href = "/login";
     }
 
     const updateUser = (updateUserData)=>{
-    
+        const newUserData = {...user,...updateUserData};
+        localStorage.setItem("user", JSON.stringify(newUserData));
+        setUser(newUserData);
     }
 
     const value = {
