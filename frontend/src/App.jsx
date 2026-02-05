@@ -14,7 +14,7 @@ import InvoiceDetail from './pages/Invoices/InvoiceDetail';
 const App = () => {
 
   return(
-    <div>
+    <AuthProvider>
    
    <Router>
     <Routes>
@@ -48,7 +48,7 @@ const App = () => {
     }
    
    />
-    </div>
+    </AuthProvider>
   )
 }
 

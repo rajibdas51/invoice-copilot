@@ -3,14 +3,16 @@ import React,{createContext,useContext, useState, useEffect} from 'react';
 const AuthContext = createContext();
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth =() =>{
+export  const useAuth =() =>{
     const context = useContext(AuthContext);
     if(!context){
         throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
 }
- 
+
+
+
 export const AuthProvider = ({children}) =>{
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export const AuthProvider = ({children}) =>{
         setIsAuthenticated(false);
         window.location.href = "/login";
     }
-
+    
     const updateUser = (updateUserData)=>{
         const newUserData = {...user,...updateUserData};
         localStorage.setItem("user", JSON.stringify(newUserData));
