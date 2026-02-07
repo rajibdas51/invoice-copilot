@@ -4,6 +4,7 @@ import {API_PATHS} from '../../utils/apiPaths.js';
 import { useAuth } from '../../context/AuthContext';
 import axiosInstance from '../../utils/axiosinstance.js';
 import { useNavigate } from 'react-router-dom';
+import { validateEmail, validatePassword } from '../../utils/helper.js';
 const Login = () => {
   const {login} = useAuth();
   const navigate = useNavigate();
@@ -46,15 +47,83 @@ const Login = () => {
     }
     
     if(error) setError("");
-    
+
 
   };
-  const handleBlur = (e)=>{};
+  const handleBlur = (e)=>{
+    const {name} = e.target;
+    setTouched((prev)=>({
+      ...prev,
+      [name]:true,
+    }));
+
+    // validate on blur
+    const newFieldErrors = {...fieldErrors};
+    if(name === "email"){
+      newFieldErrors.email = validateEmail(formData.email);
+    }else if(name === "password"){
+      newFieldErrors.password = validatePassword(formData.password);
+    }
+    setFieldErrors(newFieldErrors);
+  };
 
   const isFormValid = () => {
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    
+    return !emailError && !passwordError && formData.email && formData.password;
     
   }
   const handleSubmit = async(e) =>{
+    // validate all the fields before submitting
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    
+     if(emailError || passwordError){
+      setFieldErrors({
+        email:emailError, 
+        password:passwordError,
+      });
+      setTouched({
+        email:true,
+        password:true,
+      });
+
+   
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, formData );
+      if(response.status === 200){
+        const {token } = response.data;
+        if(token){
+       
+          setSuccess("Login successful! Redirecting...");
+          login(response.data.user, token);
+
+          // Redirect based on role
+          setTimeout(()=>{
+            window.location.href = '/dashboard';
+          },2000)
+        }
+      } 
+      else{
+        setError(response.data.message || "Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      if(error.response && error.response.data && error.response.data.message){
+        setError(error.response.data.message);
+      }else{
+            setError( "An error occurred during login. Please try again.");
+      }
+      
+    } finally{
+      setIsLoading(false);
+    }
     e.preventDefault();
   }
   return (
