@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import {Eye,EyeOff,Loader2,Mail,Lock,FileText,ArrowRight} from 'lucide-react';
-import {API_URL} from '../../utils/apiPaths.js';
+import {API_PATHS} from '../../utils/apiPaths.js';
 import { useAuth } from '../../context/AuthContext';
 import axiosInstance from '../../utils/axiosinstance.js';
 import { useNavigate } from 'react-router-dom';
@@ -25,32 +25,57 @@ const Login = () => {
     password:false,
   });
 
-  const handleInputChange = (e)=>{};
+  const handleInputChange = (e)=>{
+    const {name, value} = e.target;
+    setFormData((prev)=>(
+      {
+      ...prev,
+      [name]:value,
+    }
+    ))
+
+    // Real-time validation
+    if(touched[name]){
+      const newFieldErrors = {...fieldErrors};
+      if(name === "email"){
+          newFieldErrors.email = validateEmail(value) ? "" : "Please enter a valid email address";
+      }else if(name === "password"){
+          newFieldErrors.password = validatePassword(value) ? "" : "Password must be at least 6 characters";
+      }
+      setFieldErrors(newFieldErrors);
+    }
+    
+    if(error) setError("");
+    
+
+  };
   const handleBlur = (e)=>{};
 
-  const isFormValid = () => {}
+  const isFormValid = () => {
+    
+  }
   const handleSubmit = async(e) =>{
     e.preventDefault();
   }
   return (
-    <div className=''>
-      <div className="">
+    <div className='min-h-screen flex items-center justify-center px-4 '>
+      <div className="w-full max-w-sm">
         {/* Header */}
-        <div className="">
-          <div className="">
-            <FileText size={28} className=''/>
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-linear-to-tr from-blue-500 to-blue-900 rounded-xl mx-auto mb-6 flex items-center justify-center ">
+            <FileText className='w-6 h-6 text-white'/>
           </div>
-          <h1 className="">Login to Your Account</h1>
-          <p className="">Welcome back to Invoice Copilot</p>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Login to Your Account</h1>
+          <p className="text-gray-600 text-sm">Welcome back to Invoice Copilot</p>
         </div>
 
         {/* Form */}
-        <div className=""> 
+        <div className="space-y-4"> 
           {/* Email */}
           <div className="">
-            <label htmlFor="email" className="">Email Address</label>
-            <div className="">
-              <Mail size={18} className=''/>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <div className="relative">
+              <Mail  className='absolute left-4 top-1/2 transform -translate-y-1/2 text text-gray-400 w-5 h-5'/>
                <input
                 name='email'
                 type='email'
@@ -62,14 +87,14 @@ const Login = () => {
                 placeholder='Enter your Email'
                />
             </div>
-            {fieldErrors.email && touched.email && <p className='text-red-500 text-sm mt-1'>{fieldErrors.email}</p>}
+            {fieldErrors.email && touched.email && <p className=' mt-1  text-red-600 text-sm '>{fieldErrors.email}</p>}
 
           </div>
           {/* Password */}
           <div className="">
-            <label htmlFor="password" className="">Password</label>
-            <div className="">
-              <Lock size={18} className=''/>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <div className="relative">
+              <Lock  className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5'/>
                 <input
                   name='password'
                   type={showPassword ? 'text' : 'password'}
@@ -83,12 +108,12 @@ const Login = () => {
                 <button 
                 type='button'
                 onClick={()=>setShowPassword(!showPassword)}
-                className=''
+                className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 focus:outline-none transition-colors '
                 >
                   {showPassword ?(
-                    <EyeOff size={18} className=''/>
+                    <EyeOff  className='w-5 h-5'/>
                   ):(
-                    <Eye size={18} className=''/>
+                    <Eye  className='w-5 h-5'/>
                   )}
 
                 </button>
@@ -98,14 +123,14 @@ const Login = () => {
           </div>
           {/* Error/Success Messages */}
           {error && (
-            <div className="">
-              <p className="">{error}</p>
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
           {success &&(
-            <div className="">
-              <p className="">{success}</p>
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-600 text-sm">{success}</p>
             </div>
           )}
 
@@ -113,18 +138,18 @@ const Login = () => {
           <button 
           onClick={handleSubmit}
           disabled={isLoading || !isFormValid()}
-          className=''
+          className='w-full bg-linear-to-r from-blue-600 to-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center group'
           >
             {
               isLoading ? (
                 <>
-                <Loader2 size={18} className='animate-spin mr-2'/>
+                <Loader2 className='w-4 h-4 mr-2 animate-spin '/>
                 Signing In...
                 </>
               ):(
                 <>
                 Sign In
-                <ArrowRight size={18} className='ml-2'/>
+                <ArrowRight className='w-4 h-4 ml-2 grou-hover:translate-x-1 transition-transform '/>
                 </>
               )
             }
@@ -132,10 +157,10 @@ const Login = () => {
         </div>
         
         {/* Footer */}
-        <div className="">
-          <p className="">
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <button className="" onClick={()=>navigate("/signup")}>Sign up</button>
+            <button className="text-black font-medium hover:underline" onClick={()=>navigate("/signup")}>Sign up</button>
           </p>
 
         </div>

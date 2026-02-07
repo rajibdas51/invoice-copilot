@@ -9,12 +9,12 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import AllInvoices from './pages/Invoices/AllInvoices';
 import CreateInvoice from './pages/Invoices/CreateInvoice';
 import InvoiceDetail from './pages/Invoices/InvoiceDetail';
-
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
 
   return(
-    <AuthProvider>
+  <AuthProvider>
    
    <Router>
     <Routes>
@@ -48,7 +48,7 @@ const App = () => {
     }
    
    />
-    </AuthProvider>
+</AuthProvider>
   )
 }
 
