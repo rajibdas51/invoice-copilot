@@ -75,6 +75,7 @@ const Login = () => {
     
   }
   const handleSubmit = async(e) =>{
+      e.preventDefault();
     // validate all the fields before submitting
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
@@ -124,7 +125,7 @@ const Login = () => {
     } finally{
       setIsLoading(false);
     }
-    e.preventDefault();
+  
   }
   return (
     <div className='min-h-screen flex items-center justify-center px-4 '>
