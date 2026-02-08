@@ -10,6 +10,7 @@ import AllInvoices from './pages/Invoices/AllInvoices';
 import CreateInvoice from './pages/Invoices/CreateInvoice';
 import InvoiceDetail from './pages/Invoices/InvoiceDetail';
 import { AuthProvider } from './context/AuthContext';
+import PublicRoute from './components/auth/PublicRoute';
 
 const App = () => {
 
@@ -18,9 +19,13 @@ const App = () => {
    
    <Router>
     <Routes>
-      <Route path='/' element={<LandingPage/>} />
-      <Route path='/signup' element={<SignUp/>}/>
-      <Route path='/login' element={<Login/>}/>
+    
+      {/* public Routes*/}
+
+     <Route path='/' element={<LandingPage/>} />
+
+      <Route path='/signup' element={<PublicRoute><SignUp/></PublicRoute> }/>
+      <Route path='/login' element={<PublicRoute><Login/></PublicRoute>}/>
 
       {/* Protected  Routes */ }
 
