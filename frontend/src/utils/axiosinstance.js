@@ -30,16 +30,20 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // 1. Handle Token Expiration (401 Unauthorized)
+    //  Only logout on 401 for AUTHENTICATED requests (not login/register)
     if (error.response && error.response.status === 401) {
-      console.warn("Session expired. Logging out...");
+      const isAuthRoute =
+        error.config.url.includes("/api/auth/login") ||
+        error.config.url.includes("/api/auth/register");
 
-      // Clear the local storage so the app doesn't try to use the bad token again
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      // Don't auto-logout if it's a login/register failure
+      if (!isAuthRoute) {
+        console.warn("Session expired. Logging out...");
 
-      // Redirect to login page
-      window.location.href = "/login";
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
     }
 
     // 2. Handle common errors globally

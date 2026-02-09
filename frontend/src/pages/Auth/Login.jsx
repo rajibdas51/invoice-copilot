@@ -74,6 +74,8 @@ const Login = () => {
     return !emailError && !passwordError && formData.email && formData.password;
     
   }
+
+
   const handleSubmit = async(e) =>{
       e.preventDefault();
     // validate all the fields before submitting
@@ -90,26 +92,27 @@ const Login = () => {
         password:true,
       });
 
-   
       return;
     }
+
     setIsLoading(true);
     setError("");
     setSuccess("");
 
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, formData );
+
       if(response.status === 200){
-        const {token } = response.data;
+        const {token,...userData } = response.data;
         if(token){
        
           setSuccess("Login successful! Redirecting...");
-          login(response.data.user, token);
+          login(userData, token);
 
           // Redirect based on role
           setTimeout(()=>{
             window.location.href = '/dashboard';
-          },2000)
+          },1500)
         }
       } 
       else{
