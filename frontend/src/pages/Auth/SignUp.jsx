@@ -1,5 +1,5 @@
 import React,{useState} from 'react'
-import {Eye,EyeOff,Loader2,Mail,Lock,FileText,ArrowRight} from 'lucide-react';
+import {Eye,EyeOff,Loader2,Mail,Lock,FileText,ArrowRight, User} from 'lucide-react';
 import {API_PATHS} from '../../utils/apiPaths.js';
 import { useAuth } from '../../context/AuthContext';
 import axiosInstance from '../../utils/axiosinstance.js';
@@ -50,27 +50,27 @@ const SignUp = () => {
 
 
   return (
-    <div className=''>
-       <div className="">
+    <div className='min-h-screen bg-white flex items-center justify-center px-4 py-8 '>
+       <div className="w-full max-w-sm">
         {/* Header */ }
-        <div className="">
-          <div className="">
-            <FileText className='' />
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-linear-to-r from from-blue-500 to-blue-600 rounded-xl mx-auto mb-6 flex items-center justify center">
+            <FileText className='w-6 h-6 text-white' />
 
           </div>
-          <h1 className="">Create Account</h1>
-          <p className="">Join Invoice Generator today</p>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
+          <p className="text-gray-600 text-sm  ">Join Invoice Generator today</p>
         </div>
 
         {/*form */}
-        <div className="">
+        <div className="space-y-4">
           {/*Name*/}
           <div>
-            <label htmlFor="" className="">
+            <label htmlFor="" className="block text-sm font-medium text-gray-700 mb-2">
               Full Name
             </label>
-            <div className="">
-              <User className=""/>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 "/>
               <input 
                 name='name'
                 type='text'
@@ -83,15 +83,15 @@ const SignUp = () => {
               />
              </div>
              {fieldErrors.name && touched.name &&(
-              <p className="">{fieldErrors.name}</p>
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.name}</p>
              )}
           </div>
           {/* Email */}
           <div>
-            <label className=''>Email</label>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>Email</label>
 
-            <div className="">
-              <Mail className='' />
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 "/>
               <input type="email" 
                name='email'
                required
@@ -103,15 +103,15 @@ const SignUp = () => {
               />
             </div>
             {fieldErrors.email && touched.email &&(
-              <p className="">{fieldErrors.email}</p>
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
             )}
 
           </div>
           {/* Password */}
           <div>
-            <label className=''>Password</label>
-            <div className="">
-              <Lock className='' />
+            <label className='block text-sm font-medium text-gray-700 mb-2'>Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 " />
               <input type={showPassword?"text":"password"} 
               required
               value={formData.password}
@@ -120,21 +120,22 @@ const SignUp = () => {
               className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.password && touched.password ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
               placeholder='Create a password'
               />
-              <button type='button' onClick={()=>setShowPassword(!showPassword)} className="">
-                {showPassword ?(<EyeOff className=''/>):(<Eye className=''/>)}
+              <button type='button' onClick={()=>setShowPassword(!showPassword)} className="absolute right-4 top-1/2  transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                {showPassword ?(<EyeOff className='w-5 h-5'/>):(<Eye className='w-5 h-5'/>)}
               </button>
             </div>
             {fieldErrors.password && touched.password &&(
-              <p className="">{fieldErrors.password}</p>
-            )}
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+            )}  
+
           </div>
           
           {/* Confirm password*/}
 
           <div>
-            <label  className="">Confirm Password</label>
-            <div className="">
-              <Lock className=''/>
+            <label  className='block text-sm font-medium text-gray-700 mb-2'>Confirm Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 "/>
               <input type={showConfirmPassword? "text":"password"}
               required
               value={formData.confimPassword}
@@ -146,45 +147,48 @@ const SignUp = () => {
               <button
               type='button'
               onClick={()=>setShowConfirmPassword(!showConfirmPassword)}
-              className="">
+              className="absolute right-4 top-1/2  transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
               {
                 showConfirmPassword? (
-                  <EyeOff className='' />
-                ):(<Eye className='' />)
+                  <EyeOff className='w-5 h-5' />
+                ):(<Eye className='w-5 h-5' />)
               }
               </button>
             </div>
             {fieldErrors.confimPassword && touched.confimPassword && (
-              <p className="">{fieldErrors.confimPassword}</p>
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.confimPassword}</p>
             )}
+
           </div>
 
           {/* Error/success Messages */}
            {
             error &&(
-              <div className="">
-                <p className="">{error}</p>
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg ">
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
             )
            }
 
            {
             success &&(
-              <div className="">
-                <p className="">{success}</p>
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg ">
+                <p className="text-green-600 text-sm">{success}</p>
               </div>
             )
            }
          
          {/* Terms & Conditions */}
 
-         <div className="">
-          <input type="checkbox" id='terms'  className="" required/>
-          <label htmlFor="" className=''>
+         <div className="flex items-start pt-2">
+          <input type="checkbox" id='terms'
+            className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black mt-1 " 
+            required/>
+          <label htmlFor="terms" className='ml-2 text-sm text-gray-600'>
             I agree to the {" "} 
-            <button className="">Terms of Service</button> {" "}
+            <button className="text-black hover:underline">Terms of Service</button> {" "}
             and{" "}
-            <button className="">Privacy Policy</button>
+            <button className="text-black hover:underline">Privacy Policy</button>
           </label>
          </div>
 
@@ -192,27 +196,27 @@ const SignUp = () => {
          <button  
          onClick={handleSubmit} 
          disabled={isLoading || !isFormValid()}
-         className=""
+         className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center group"
          >
           {
             isLoading ? (
               <>
-              <Loader2 className=''/>
+              <Loader2 className='w-4 h-4 mr-2 animate-spin'/>
               Creating account...
               </>
             ):(<>
               Create Account 
-              <ArrowRight className='' />
+              <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform ' />
             </>)
           }
          </button>
         </div>
 
         {/*----- Footer ---*/}
-        <div className="">
-          <p className="">
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center  ">
+          <p className="text-sm text-gray-600">
             Already have an Account? {" "}
-            <button className="" onClick={()=> navigate("/login")}>Sign in</button>
+            <button className="text-black font-medium hover:underline" onClick={()=> navigate("/login")}>Sign in</button>
           </p>
         </div>
 
