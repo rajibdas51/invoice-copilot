@@ -11,11 +11,11 @@ const SignUp = () => {
   const {login} = useAuth();
   const navigate = useNavigate();
 
-  const {formData, setFormData} = useState({
+  const [formData, setFormData] = useState({
     name:"",
     email:"",
     password:"",
-    confimPassword:""
+    confirmPassword:""
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -27,22 +27,22 @@ const SignUp = () => {
     name:"",
     email:"",
     password:"",
-    confimPassword:""
+    confirmPassword:""
   });
 
   const [touched, setTouched] = useState({
     name:false,
     email:false,
     password:false,
-    confimPassword:false
+    confirmPassword:false
   });
 
   // validation functions
 
   const validateName = (name)=>{
     if(!name) return "Name is required!";
-    if(name.length <2) "Name must be at least 2 characters!";
-    if(name.length > 50) "Name must be less than 50 characters!";
+    if(name.length <2) return "Name must be at least 2 characters!";
+    if(name.length > 50) return "Name must be less than 50 characters!";
 
     return "";
   };
@@ -53,13 +53,13 @@ const SignUp = () => {
   };
 
   const handleInputChange = (e)=>{
-       e.preventDefault();
+     
        const {name, value} = e.target;
        setFormData((prev)=>(
         {
           ...prev,[name]:value
         }
-       ))
+       ));
 
        // real time validation
        if(touched[name]){
@@ -71,16 +71,16 @@ const SignUp = () => {
           newFieldErrors.email = validateEmail(value);
         } 
         else if(name==="password"){
-          newFieldErrors.email = validatePassword(value);
+          newFieldErrors.password = validatePassword(value);
           // also revalidate confirm password if it's been touched
-          if(touched.confimPassword){
-            newFieldErrors.confimPassword = validateConfirmPassword(
-              formData.confimPassword,value
+          if(touched.confirmPassword){
+            newFieldErrors.confirmPassword = validateConfirmPassword(
+              formData.confirmPassword,value
             );
           } 
         }
         else if(name === "confirmPassword"){
-          newFieldErrors.confimPassword = validateConfirmPassword(
+          newFieldErrors.confirmPassword = validateConfirmPassword(
             value,
             formData.password
           );
@@ -95,10 +95,123 @@ const SignUp = () => {
        
 
   };
-  const handleBlur =(e)=>{};
-  const isFormValid= ()=>{};
-  const handleSubmit = async()=>{}
+  const handleBlur =(e)=>{
+    const {name} = e.target;
+    setTouched((prev)=>(
+      {...prev,[name]:true}
+    ));
 
+    // validate on Blur
+
+  const newFieldErrors = {...fieldErrors};
+    if(name==="name"){
+          newFieldErrors.name = validateName(formData.name);
+        } 
+        else if(name ==="email"){
+          newFieldErrors.email = validateEmail(formData.email);
+        } 
+        else if(name==="password"){
+          newFieldErrors.password = validatePassword(formData.password);
+       
+        }
+        else if(name === "confirmPassword"){
+          newFieldErrors.confirmPassword = validateConfirmPassword(    
+            formData.confirmPassword,formData.password
+          );
+        }
+        setFieldErrors(newFieldErrors);
+  };
+  const isFormValid= ()=>{
+    const nameError = validateName(formData?.name);
+    const emailError = validateEmail(formData?.email);
+    const passwordError = validatePassword(formData?.password);
+    const confirmPasswordError = validateConfirmPassword(formData?.confirmPassword,formData?.password);
+
+    return (
+      !nameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmPasswordError &&
+      formData?.name && 
+      formData?.email &&
+      formData?.password &&
+      formData?.confirmPassword
+    )
+  };
+
+  const handleSubmit = async()=>{
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    const confirmPasswordError = validateConfirmPassword(formData.confirmPassword,formData.password);
+    
+    if(nameError || emailError || passwordError || confirmPasswordError){
+       setFieldErrors({
+        name:nameError,
+        email: emailError,
+        password: passwordError,
+        confirmPassword:confirmPasswordError
+       });
+       setTouched({
+         name:true,
+         email:true,
+         password:true,
+         confirmPassword:true
+       })
+
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        name:formData.name,
+        email:formData.email,
+        password:formData.password
+      });
+      const data = response.data;
+      const{token,...user} = data;
+      if(response.status ===201){
+        setSuccess("Account created successfully!");
+
+        //Reset form
+        setFormData({
+         name:"",
+        email:"",
+        password:"",
+        confirmPassword:""
+        })
+        setTouched({
+             name:false,
+        email:false,
+        password:false,
+        confirmPassword:false
+        });
+
+        // login the user immediately after successful registration
+        login(user,token);
+        navigate('/dashboard');
+      }
+      
+    } catch (error) {
+      if(error.response && error.response.data && error.response.data.message){
+        setError(error.response.data.message);
+      } else{
+        setError("Registration failed. Please try again!");
+      }
+      console.error("API error:", error.response || error)
+      
+    } finally{
+       setIsLoading(false)
+    }
+
+
+
+  }
+  
 
 
   return (
@@ -127,7 +240,7 @@ const SignUp = () => {
                 name='name'
                 type='text'
                 required
-                value={formData.name}
+                value={formData?.name}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.name && touched.name ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
@@ -147,7 +260,7 @@ const SignUp = () => {
               <input type="email" 
                name='email'
                required
-               value={formData.email}
+               value={formData?.email}
                onChange={handleInputChange}
                onBlur={handleBlur}
                  className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.email && touched.email ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
@@ -165,8 +278,9 @@ const SignUp = () => {
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 " />
               <input type={showPassword?"text":"password"} 
+              name='password'
               required
-              value={formData.password}
+              value={formData?.password}
               onChange={handleInputChange}
               onBlur={handleBlur}
               className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.password && touched.password ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
@@ -189,12 +303,13 @@ const SignUp = () => {
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 "/>
               <input type={showConfirmPassword? "text":"password"}
+              name='confirmPassword'
               required
-              value={formData.confimPassword}
+              value={formData?.confirmPassword}
               onChange={handleInputChange}
               onBlur={handleBlur}
 
-               className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.confimPassword && touched.confimPassword ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
+               className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent outline-none transition-all ${fieldErrors.confirmPassword && touched.confirmPassword ?"border-red-300 focus:ring-red-500":"border-gray-300 focus:ring-black"}`}
               placeholder='Confirm your password'/>
               <button
               type='button'
@@ -207,8 +322,8 @@ const SignUp = () => {
               }
               </button>
             </div>
-            {fieldErrors.confimPassword && touched.confimPassword && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors.confimPassword}</p>
+            {fieldErrors.confirmPassword && touched.confirmPassword && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
             )}
 
           </div>
@@ -224,7 +339,7 @@ const SignUp = () => {
 
            {
             success &&(
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg ">
+              <div className="p-3 bg-red-green border border-green-200 rounded-lg ">
                 <p className="text-green-600 text-sm">{success}</p>
               </div>
             )
