@@ -4,7 +4,7 @@ import {API_PATHS} from '../../utils/apiPaths.js';
 import { useAuth } from '../../context/AuthContext';
 import axiosInstance from '../../utils/axiosinstance.js';
 import { useNavigate } from 'react-router-dom';
-import { validateEmail, validatePassword } from '../../utils/helper.js';
+import {  validateEmail, validatePassword } from '../../utils/helper.js';
 
 
 const SignUp = () => {
@@ -39,10 +39,62 @@ const SignUp = () => {
 
   // validation functions
 
-  const validateName = (name)=>{};
-  const validateConfirmPassword = (confirmPassword, password)=>{};
+  const validateName = (name)=>{
+    if(!name) return "Name is required!";
+    if(name.length <2) "Name must be at least 2 characters!";
+    if(name.length > 50) "Name must be less than 50 characters!";
 
-  const handleInputChange = (e)=>{};
+    return "";
+  };
+  const validateConfirmPassword = (confirmPassword, password)=>{
+    if(!confirmPassword) return "Please confirm your password";
+    if(confirmPassword !== password) return "Passwords do not match!"
+    return "";
+  };
+
+  const handleInputChange = (e)=>{
+       e.preventDefault();
+       const {name, value} = e.target;
+       setFormData((prev)=>(
+        {
+          ...prev,[name]:value
+        }
+       ))
+
+       // real time validation
+       if(touched[name]){
+        const newFieldErrors = {...fieldErrors};
+        if(name==="name"){
+          newFieldErrors.name = validateName(value);
+        } 
+        else if(name ==="email"){
+          newFieldErrors.email = validateEmail(value);
+        } 
+        else if(name==="password"){
+          newFieldErrors.email = validatePassword(value);
+          // also revalidate confirm password if it's been touched
+          if(touched.confimPassword){
+            newFieldErrors.confimPassword = validateConfirmPassword(
+              formData.confimPassword,value
+            );
+          } 
+        }
+        else if(name === "confirmPassword"){
+          newFieldErrors.confimPassword = validateConfirmPassword(
+            value,
+            formData.password
+          );
+        }
+
+        setFieldErrors(newFieldErrors);
+ 
+       }
+
+       if(error) setError("");
+
+       
+
+  };
   const handleBlur =(e)=>{};
   const isFormValid= ()=>{};
   const handleSubmit = async()=>{}
