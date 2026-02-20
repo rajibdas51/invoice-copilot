@@ -1,5 +1,5 @@
 import {useState,useEffect} from 'react'
-import  {Briefcase, Logout,Menu,X} from 'lucide-react';
+import  {Briefcase, LogOut,Menu,X} from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom'; 
 import{ useAuth} from "../../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown"
@@ -34,6 +34,30 @@ const DashboardLayout = ({children}) => {
  },[]);
 
  // close dropdowns when clicking outside
+
+ 
+ useEffect(()=>{
+  const handleClickOutside = ()=>{
+    if(profileDropDownOpen){
+      setProfileDropDownOpen(false);
+    }
+  }
+   
+  document.addEventListener("click", handleClickOutside);
+
+  return ()=> document.removeEventListener("click", handleClickOutside);
+
+ },[profileDropDownOpen])
+
+
+ const handleNavigation = (itemId)=>{
+  setActiveNavItem(itemId);
+  navigate(`/${itemId}`);
+  if(isMobile){
+    setSidebarOpen(false);
+  }
+ };
+
 
 
   return (
