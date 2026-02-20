@@ -58,7 +58,9 @@ const DashboardLayout = ({children}) => {
   }
  };
 
-
+const toggleSidebar= ()=>{
+  setSidebarOpen(!sidebarOpen);
+}
 
   return (
     <div>DashboardLayout
