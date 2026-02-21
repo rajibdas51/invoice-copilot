@@ -3,6 +3,11 @@ import  {Briefcase, LogOut,Menu,X} from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom'; 
 import{ useAuth} from "../../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown"
+import { NAVIGATION_MENU } from '../../utils/data';
+import NavigationItem from './NavigationItem';
+
+
+
 const DashboardLayout = ({children, activeMenu}) => {
   const {user,logout} = useAuth();
   const navigate = useNavigate();
@@ -83,15 +88,26 @@ const sidebarCollapsed = !isMobile && false;
 
        {/* Navigation */}
        <nav className='p-4 space-y-2'>
-         
+          {
+            NAVIGATION_MENU.map((item)=>(
+              <NavigationItem 
+               key={item.id}
+               item={item}
+               isActive={activeNavItem === item.id}
+               onClick = {handleNavigation}
+               isCollapsed ={sidebarCollapsed}
+              
+              />
+            ))
+          }
        </nav>
        
        {/* Logout */}
         
-        <div className="">
-          <button className="" onClick={logout}> 
-            <LogOut className=''/>
-            {!sidebarCollapsed &&  <span className=''>Logout</span>}
+        <div className="absolute bottom-4 left-4 right-4 ">
+          <button className="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200" onClick={logout}> 
+            <LogOut className='h-5 w-5 shrink-0 text-gray-500'/>
+            {!sidebarCollapsed &&  <span className='ml-3'>Logout</span>}
           </button>
         </div>
 
@@ -100,7 +116,7 @@ const sidebarCollapsed = !isMobile && false;
        {/* Mobile overlay */}
        
        {isMobile && sidebarOpen && (
-        <div className="" onClick={()=>setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/10 bg-opacity-25 z-40 backdrop-blur-sm" onClick={()=>setSidebarOpen(false)} />
        )}
 
        {/* Main Content */}
@@ -111,28 +127,28 @@ const sidebarCollapsed = !isMobile && false;
 
         { /* Top navbar */}
 
-        <header className="">
-          <div className="">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-30 ">
+          <div className="flex items-center space-x-4">
               {isMobile &&(
-                <button className="" onClick={toggleSidebar}>
-                  {sidebarOpen? (<X className=''/>):(<Menu className=''/>)}
+                <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 " onClick={toggleSidebar}>
+                  {sidebarOpen? (<X className='h-5 w-5 text-gray-600'/>):(<Menu className='h-5 w-5 text-gray-600'/>)}
                 </button>
               )}
               <div>
-                <h1 className="">
+                <h1 className="text-base font-semibold text-gray-900">
                   Welcome back, {user?.name}
                 </h1>
-                <p className=''> here's your invoice overview.</p>
+                <p className='text-sm text-gray-500 hidden sm:block'> here's your invoice overview.</p>
               </div>
           </div>
-          <div className="">
+          <div className="flex items-center space-x-3">
              {/* Profile dropdown*/}
 
           </div>
         </header>
 
         {/*---- Main content area---- */}
-        <main className="">{children}</main>
+        <main className="flex-1 overflow-auto p-6">{children}</main>
        </div>
 
     </div>
