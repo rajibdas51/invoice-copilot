@@ -14,7 +14,7 @@ const DashboardLayout = ({children, activeMenu}) => {
 
   const [sidebarOpen,setSidebarOpen] = useState(false);
   const [activeNavItem,setActiveNavItem] = useState(activeMenu || "dashboard");
-  const [profileDropDownOpen,setProfileDropDownOpen] = useState(false);
+  const [profileDropdownOpen,setProfileDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Handle responsive behavior
@@ -43,8 +43,8 @@ const DashboardLayout = ({children, activeMenu}) => {
  
  useEffect(()=>{
   const handleClickOutside = ()=>{
-    if(profileDropDownOpen){
-      setProfileDropDownOpen(false);
+    if(profileDropdownOpen){
+      setProfileDropdownOpen(false);
     }
   }
    
@@ -52,7 +52,7 @@ const DashboardLayout = ({children, activeMenu}) => {
 
   return ()=> document.removeEventListener("click", handleClickOutside);
 
- },[profileDropDownOpen])
+ },[profileDropdownOpen])
 
 
  const handleNavigation = (itemId)=>{
@@ -143,6 +143,15 @@ const sidebarCollapsed = !isMobile && false;
           </div>
           <div className="flex items-center space-x-3">
              {/* Profile dropdown*/}
+             <ProfileDropdown 
+               isOpen={profileDropdownOpen}
+               onToggle={ (e)=>{
+                e.stopPropagation();
+                setProfileDropdownOpen(!profileDropdownOpen);
+               }}
+             
+             
+             />
 
           </div>
         </header>
