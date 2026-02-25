@@ -80,6 +80,12 @@ const getInvoiceById = async (req, res) => {
       res.status(404);
       throw new Error("Invoice not found");
     }
+    // check if the invoice belongs to the user
+
+    if (invoice.user.toString() !== req.user.id) {
+      res.status(401);
+      throw new Error("Unauthorized access");
+    }
     res.json(invoice);
   } catch (error) {
     res.status(500);

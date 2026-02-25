@@ -83,7 +83,42 @@ if(loading){
 }
 
   return (
-    <div>Dashboard</div>
+    <div className='space-y-8 pb-96'>
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900">Dashboard</h2>
+        <p className="text-sm text-slate-600 mt-1">A quick overview of your invoices</p>
+      </div>
+
+      {/* Stats cards*/}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3  gap-6">
+        {statsData.map((stat,index)=>(
+          <div className="bg-white p-4 rounded-xl border border-slate-200  shadow-lg shadow-gray-100 " key={index}>
+             <div className="flex items-center">
+              <div className={`shrink-0 w-12 h-12 ${colorClasses[stat.color].bg} rounded-full flex items-center justify-center `}>
+                <stat.icon className={`h-6 w-6 ${colorClasses[stat.color].text}`} />
+              </div>
+              <div className="ml-4 min-w-0">
+                <div className="text-sm font-medium text-slate-500 truncate ">
+                  {stat.label}
+                </div>
+                <div className="text-2xl font-bold text-slate-900 wrap-break-word truncate">
+                  {stat.value}
+                </div>
+              </div>
+
+             </div>
+          </div>
+        ))}
+
+      </div>
+
+      { /* AI Insights Card */}
+ 
+
+      {/* Recent Invoices  */}
+
+    </div>
   )
 }
 
