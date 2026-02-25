@@ -6,6 +6,7 @@ const ProfileDropdown = ({
     avatar,
     companyName,
     email,
+    name,
     onLogout
 }) => {
 
@@ -20,7 +21,7 @@ const ProfileDropdown = ({
        ) :(
         <div className="h-8 w-8 bg-linear-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center">
             <span className="text-white font-semibold text-sm">
-                {companyName.charAt(0).toUpperCase()} 
+                {companyName? (companyName?.charAt(0).toUpperCase()): (name?.charAt(0).toUpperCase())} 
             </span>
         </div>
        )}
@@ -38,7 +39,7 @@ const ProfileDropdown = ({
         {isOpen && (
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
                 <div className="px-4 py-3 border-b border-gray-100  ">
-                    <p className=" text-sm font-medium text-gray-900">{companyName}</p>
+                    <p className=" text-sm font-medium text-gray-900">{companyName || name}</p>
                     <p className="text-xs text-gray-500">{email}</p>
                 </div>
 

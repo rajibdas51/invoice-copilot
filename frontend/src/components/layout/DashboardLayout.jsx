@@ -148,8 +148,13 @@ const sidebarCollapsed = !isMobile && false;
                onToggle={ (e)=>{
                 e.stopPropagation();
                 setProfileDropdownOpen(!profileDropdownOpen);
-               }}
-             
+              
+              }}
+             avatar={user?.avatar || ""}
+             companyName={user?.name||""}
+             email={user?.email||""}
+             name={user?.name||""}
+             onLogout={logout }
              
              />
 

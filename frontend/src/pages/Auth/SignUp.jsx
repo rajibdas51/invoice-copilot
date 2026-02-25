@@ -205,7 +205,7 @@ const SignUp = () => {
       console.error("API error:", error.response || error)
       
     } finally{
-       setIsLoading(false)
+       setIsLoading(false); 
     }
 
 

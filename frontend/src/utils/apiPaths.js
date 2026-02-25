@@ -9,7 +9,7 @@ export const API_PATHS = {
   },
   INVOICE: {
     CREATE: "/api/invoices", // Create a new invoice
-    GET_ALL: "/api/invoices", // Get all invoices for the logged-in user
+    GET_ALL_INVOICES: "/api/invoices", // Get all invoices for the logged-in user
     GET_INVOICE_BY_ID: (id) => `/api/invoices/${id}`, // Get a specific invoice by ID
     UPDATE_INVOICE: (id) => `/api/invoices/${id}`, // Update a specific invoice by ID
     DELETE_INVOICE: (id) => `/api/invoices/${id}`, // Delete a specific invoice by ID
