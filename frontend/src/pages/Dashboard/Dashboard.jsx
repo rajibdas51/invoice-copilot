@@ -114,6 +114,7 @@ if(loading){
       </div>
 
       { /* AI Insights Card */}
+    <AIInsightsCard/>
  
 
       {/* Recent Invoices  */}
