@@ -5,6 +5,7 @@ import { Loader2,FileText, DollarSign, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import Button from "../../components/ui/Button";
+import AIInsightsCard from '../../components/ui/AIInsightsCard';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({

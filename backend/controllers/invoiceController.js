@@ -6,7 +6,7 @@ import Invoice from "../models/Invoice.js";
 
 const createInvoice = async (req, res) => {
   try {
-    const user = req.user;
+    const user = req.user._id;
     const {
       invoiceNumber,
       invoiceDate,
@@ -58,7 +58,10 @@ const createInvoice = async (req, res) => {
 
 const getInvoices = async (req, res) => {
   try {
-    const invoices = await Invoice.find().populate("user", "name email");
+    const invoices = await Invoice.find({ user: req.user._id }).populate(
+      "user",
+      "name email",
+    );
     res.json(invoices);
   } catch (error) {
     res.status(500);

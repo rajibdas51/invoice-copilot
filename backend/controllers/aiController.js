@@ -94,15 +94,18 @@ const generateReminderEmail = async (req, res) => {
 const getDashboardSummary = async (req, res) => {
   try {
     const invoices = await Invoice.find({ user: req.user._id });
+
+    console.log("Invoices found:", invoices.length);
+    console.log("User ID:", req.user._id);
+
     if (invoices.length === 0) {
-      res.status(200);
-      throw new Error("No invoices found for the user");
+      return res.status(200).json({ insights: [] });
     }
 
     // Process and summarize invoice data
     const totalInvoices = invoices.length;
-    const paidInvoices = invoices.filter((inv) => inv.status === "Paid");
-    const unpaidInvoices = invoices.filter((inv) => inv.status !== "Paid");
+    const paidInvoices = invoices.filter((inv) => inv.status === "paid");
+    const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid");
     const totalRevenue = invoices.reduce((sum, inv) => sum + inv.total, 0);
     const totalOutstanding = unpaidInvoices.reduce(
       (sum, inv) => sum + inv.total,
@@ -145,7 +148,10 @@ const getDashboardSummary = async (req, res) => {
     });
     const result = await model.generateContent(prompt);
     const responseText = await result.response.text();
+    console.log("Raw Gemini response:", responseText);
+    console.log("Data summary being sent:", dataSummary);
     const parsedInsights = JSON.parse(responseText);
+    console.log("Parsed insights:", parsedInsights);
 
     res.status(200).json({ insights: parsedInsights.insights });
   } catch (error) {
