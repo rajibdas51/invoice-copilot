@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react'
 import {useNavigate, useLocation} from "react-router-dom";
 import  axiosInstance from "../../utils/axiosinstance";
 import { API_PATHS } from '../../utils/apiPaths';
-import {Plus, Trash} from "lucide-react";
+import {Plus, Trash2} from "lucide-react";
 import toast from "react-hot-toast";
 import moment from 'moment';
 import {useAuth} from "../../context/AuthContext";
@@ -170,6 +170,56 @@ const handleSubmit = async (e) => {
 
         </div>
 
+      </div>
+
+      <div className="">
+        <div className="">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Items</h3>
+
+        </div>
+        <div className="">
+          <table className="">
+            <thead className=''>
+              <tr>
+                <th className="">Item</th>
+                <th className="">Qty </th>
+                <th className="">Price</th>
+                <th className="">Tax (%)</th>
+                <th className="">Total</th>
+                <th className=""></th>
+              </tr>
+            </thead>
+            <tbody className=''>
+              {formData.items.map((item,index)=>()=>(
+                <tr key={index} className=''>
+                  <td className="">
+                    <input type="text" name='' value={item.name} onChange={(e)=>handleInputChange(e,null,index)} className='' placeholder='Item Name'/>
+                  </td>
+                  <td className="">
+                    <input type="number" name='' value={item.quantity} onChange={(e)=>handleInputChange(e,null,index)} className='' placeholder='Quantity'/>
+
+                  </td>
+                  <td className="">
+                   <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0.00' className=""/>
+                  </td>
+                  <td className="">
+                    <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0' className=""/>
+                  </td>
+                  <td className="">
+                    ${((item.quantity || 0) * (item.unitPrice || 0))*(1 + (item.taxPercent || 0) / 100).oFixed(2)}
+                  </td>
+                  <td className="">
+                    <Button type="button" variant='ghost' size='small' onClick={()=>handleRemoveItem(index)}><Trash2/>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="">
+        <Button type="button" variant='secondary' onClick={handleAddItem} icon={Plus}> Add Item</Button>
       </div>
     </form>
   )
