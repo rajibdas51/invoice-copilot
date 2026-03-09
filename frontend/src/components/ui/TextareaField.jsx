@@ -16,4 +16,4 @@ const TextareaField = ({icon:Icon, label, name, ...props}) => {
   )
 }
 
-export default TextareaField
+export default TextareaField;

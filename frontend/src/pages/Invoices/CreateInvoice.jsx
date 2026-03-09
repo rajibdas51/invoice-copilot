@@ -6,7 +6,11 @@ import {Plus, Trash} from "lucide-react";
 import toast from "react-hot-toast";
 import moment from 'moment';
 import {useAuth} from "../../context/AuthContext";
-const InvoiceDetail = () => {}
+
+import InputField from "../../components/ui/InputField";
+import SelectField from "../../components/ui/SelectField";
+import TextareaField from "../../components/ui/TextareaField";
+import Button from "../../components/ui/Button";
 
 const CreateInvoice = ({existingInvoice, onSave}) => {
   const navigate = useNavigate();
@@ -120,7 +124,54 @@ const handleSubmit = async (e) => {
 
 
   return (
-    <div>CreateInvoice</div>
+    <form onSubmit={handleSubmit} className='space-y-8 pb-[100vh]'>
+
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-slate-900">{existingInvoice ? "Edit Invoice" : "Create Invoice"}</h2>
+        <Button type="submit" isLoading={loading|| isGeneratingNumber}>
+          {existingInvoice? "Save Changes":"Save Invoice"}
+        </Button>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputField
+            label="Invoice Number"
+            name="invoiceNumber"
+            readonly
+
+            value={formData.invoiceNumber}
+             placeholder={isGeneratingNumber? "Generating...":""}
+             disabled
+/>
+        <InputField  label="Invoice Date" name="invoiceDate" value={formData.invoiceDate} type="date" onChange={handleInputChange}/>
+        <InputField label="Due Date" name="dueDate" value={formData.dueDate} type="date" onChange={handleInputChange}/>
+        
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Bill From </h3>
+            <InputField  label="Business Name" name="businessName" value={formData.billFrom.businessName} onChange={(e)=> handleInputChange(e,"billFrom")}/>
+            <InputField  label="Email" name="email" value={formData.billFrom.email} onChange={(e)=> handleInputChange(e,"billFrom")}/>
+
+            <TextareaField label="Address" name="address" value={formData.billFrom.address} onChange={(e)=> handleInputChange(e,"billFrom")}/>  
+            <InputField  label="Phone" name="phone" value={formData.billFrom.phone} onChange={(e)=> handleInputChange(e,"billFrom")}/>
+        
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Bill To </h3>
+            <InputField  label="Client Name" name="clientName" value={formData.billTo.clientName} onChange={(e)=> handleInputChange(e,"billTo")}/>
+            <InputField  label="ClientEmail" name="email" value={formData.billTo.email} onChange={(e)=> handleInputChange(e,"billTo")}/>
+            <TextareaField label=" Client Address" name="address" value={formData.billTo.address} onChange={(e)=> handleInputChange(e,"billTo")}/>  
+            
+            <InputField  label="Client Phone" name="phone" value={formData.billTo.phone} onChange={(e)=> handleInputChange(e,"billTo")}/>
+
+        </div>
+
+      </div>
+    </form>
   )
 
 }

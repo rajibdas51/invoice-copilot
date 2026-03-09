@@ -17,4 +17,4 @@ const SelectField = ({label, name, options, ...props}) => {
   )
 }
 
-export default SelectField
+export default SelectField;

@@ -17,4 +17,4 @@ const InputField = ({icon:Icon, label, name, ...props}) => {
   )
 }
 
-export default InputField
+export default InputField;
