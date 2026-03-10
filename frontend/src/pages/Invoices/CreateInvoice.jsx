@@ -172,43 +172,44 @@ const handleSubmit = async (e) => {
 
       </div>
 
-      <div className="">
-        <div className="">
+      <div className="bg-white border border-b-slate-200 rounded-lg shadow-sm shadow-gray-100 overflow-hidden ">
+        <div className="p-4 sm:p-6 border-b border-slate-200 bg-slate-50 ">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Items</h3>
 
         </div>
-        <div className="">
-          <table className="">
-            <thead className=''>
+        <div className="overflow-x-auto">
+          <table className="w-full divide-y divide-slate-200">
+            <thead className='bg-slate-50'>
               <tr>
-                <th className="">Item</th>
-                <th className="">Qty </th>
-                <th className="">Price</th>
-                <th className="">Tax (%)</th>
-                <th className="">Total</th>
-                <th className=""></th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Item</th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Qty </th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tax (%)</th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total</th>
+                <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"></th>
               </tr>
+
             </thead>
-            <tbody className=''>
+            <tbody className='bg-white divide-y divide-slate-200'>
               {formData.items.map((item,index)=>()=>(
-                <tr key={index} className=''>
-                  <td className="">
-                    <input type="text" name='' value={item.name} onChange={(e)=>handleInputChange(e,null,index)} className='' placeholder='Item Name'/>
+                <tr key={index} className='hover:bg-slate-50'>
+                  <td className="px-2 sm:px-6 py-4">
+                    <input type="text" name='' value={item.name} onChange={(e)=>handleInputChange(e,null,index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Item Name'/>
                   </td>
-                  <td className="">
+                  <td className="px-2 sm:px-6 py-4">
                     <input type="number" name='' value={item.quantity} onChange={(e)=>handleInputChange(e,null,index)} className='' placeholder='Quantity'/>
 
                   </td>
-                  <td className="">
+                  <td className="px-2 sm:px-6 py-4">
                    <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0.00' className=""/>
                   </td>
-                  <td className="">
+                  <td className="px-2 sm:px-6 py-4">
                     <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0' className=""/>
                   </td>
-                  <td className="">
+                  <td className="px-2 sm:px-6 py-4">
                     ${((item.quantity || 0) * (item.unitPrice || 0))*(1 + (item.taxPercent || 0) / 100).oFixed(2)}
                   </td>
-                  <td className="">
+                  <td className="px-2 sm:px-6 py-4">
                     <Button type="button" variant='ghost' size='small' onClick={()=>handleRemoveItem(index)}><Trash2/>
                     </Button>
                   </td>
@@ -226,3 +227,4 @@ const handleSubmit = async (e) => {
 
 }
 export default CreateInvoice;
+
