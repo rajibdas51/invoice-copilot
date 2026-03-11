@@ -111,7 +111,10 @@ const handleAddItem = ()=>{
   setFormData({...formData,items:[...formData.items,{name:"",quantity:1,unitPrice:0,taxPercent:0}]  })
 }
 
-const handleRemoveItem = (index)=>{}
+const handleRemoveItem = (index)=>{
+  const newItems = formData.items.filter((_,i)=>i !== index);
+  setFormData({...formData,items:newItems})
+}
 
 const {subtotal, taxTotal, total} = (()=>{
   let subtotal = 0, taxTotal = 0;
