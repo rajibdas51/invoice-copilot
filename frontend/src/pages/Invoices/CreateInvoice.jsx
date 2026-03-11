@@ -94,9 +94,18 @@ useEffect(() => {
 
 ,[existingInvoice]);
 
-const handleInputChange = (e,section,index) => {
-
-}
+const handleInputChange = (e, section, index) => {
+  const { name, value } = e.target;
+  if (section) {
+    setFormData((prev) => ({ ...prev, [section]: { ...prev[section], [name]: value } }));
+  } else if (index !== undefined) {
+    const newItems = [...formData.items];
+    newItems[index] = { ...newItems[index], [name]: value };
+    setFormData((prev) => ({ ...prev, items: newItems }));
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+};
 
 const handleAddItem = ()=>{
   setFormData({...formData,items:[...formData.items,{name:"",quantity:1,unitPrice:0,taxPercent:0}]  })
@@ -197,20 +206,20 @@ const handleSubmit = async (e) => {
                     <input type="text" name='' value={item.name} onChange={(e)=>handleInputChange(e,null,index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Item Name'/>
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                    <input type="number" name='' value={item.quantity} onChange={(e)=>handleInputChange(e,null,index)} className='' placeholder='Quantity'/>
+                    <input type="number" name='' value={item.quantity} onChange={(e)=>handleInputChange(e,null,index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Quantity'/>
 
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                   <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0.00' className=""/>
+                   <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0.00' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                    <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0' className=""/>
+                    <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
                   </td>
-                  <td className="px-2 sm:px-6 py-4">
+                  <td className="px-2 sm:px-6 py-4 text-sm text-slate-500">
                     ${((item.quantity || 0) * (item.unitPrice || 0))*(1 + (item.taxPercent || 0) / 100).oFixed(2)}
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                    <Button type="button" variant='ghost' size='small' onClick={()=>handleRemoveItem(index)}><Trash2/>
+                    <Button type="button" variant='ghost' size='small' onClick={()=>handleRemoveItem(index)}><Trash2 className='w-4 h-4 text-red-500'/>
                     </Button>
                   </td>
                 </tr>
@@ -218,10 +227,31 @@ const handleSubmit = async (e) => {
             </tbody>
           </table>
         </div>
-      </div>
-      <div className="">
+         <div className="p-4 sm:p-6 border-t border-slate-200">
         <Button type="button" variant='secondary' onClick={handleAddItem} icon={Plus}> Add Item</Button>
       </div>
+      </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 space-y-4">
+        <h3 className="text-lg font-semibold text-slate-900 mb-2">Notes and Terms</h3>
+        <TextareaField label="Notes" name="notes" value={formData.notes} onChange={handleInputChange}/>
+        <SelectField label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleInputChange}
+        options={["Net 15", "Net 30" , "Net 60", "Due on receipt"]}
+        
+        />
+        "
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 flex flex-col justify-center ">
+        <div className="space-y-4">
+          <div className="flex justify-between text-sm text-slate-600"><p>Subtotal:</p> <p>${subtotal.toFixed(2)}</p> </div>
+          <div className="flex justify-between text-sm text-slate-600"><p>Tax</p> <p>${taxTotal.toFixed(2)}</p></div>
+          <div className="flex justify-between text-lg font-semibold text-slate-900 border-t border-slate-200 pt-4 mt-4 "><p>Total</p> <p>${total.toFixed(2)}</p></div>
+
+        </div>
+      </div>
+    </div>
+     
     </form>
   )
 
