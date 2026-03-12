@@ -148,10 +148,8 @@ const getDashboardSummary = async (req, res) => {
     });
     const result = await model.generateContent(prompt);
     const responseText = await result.response.text();
-    console.log("Raw Gemini response:", responseText);
-    console.log("Data summary being sent:", dataSummary);
+
     const parsedInsights = JSON.parse(responseText);
-    console.log("Parsed insights:", parsedInsights);
 
     res.status(200).json({ insights: parsedInsights.insights });
   } catch (error) {

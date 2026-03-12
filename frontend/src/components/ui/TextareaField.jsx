@@ -10,7 +10,7 @@ const TextareaField = ({icon:Icon, label, name, ...props}) => {
                     <Icon className='w-5 h-5 text-slate-400'/>
                 </div>
             }
-            <textarea id='name' name='name' rows={3} {...props} className={`w-full min-h-25 pr-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${Icon ?"pl-10":"pl-3"} `} />
+            <textarea id={name} name={name} rows={3} {...props} className={`w-full min-h-25 pr-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${Icon ?"pl-10":"pl-3"} `} />
         </div>
     </div>
   )

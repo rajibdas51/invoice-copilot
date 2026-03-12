@@ -14,6 +14,7 @@ import Button from "../../components/ui/Button";
 
 const CreateInvoice = ({existingInvoice, onSave}) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {user} = useAuth();
   const [formData, setFormData] = useState(
   existingInvoice || {
@@ -39,60 +40,63 @@ const [isGeneratingNumber, setIsGeneratingNumber] = useState(!existingInvoice);
 useEffect(() => {
   const aiData = location.state?.aiData;
 
-  if(aiData){
-  setFormData(prev =>({
-    ...prev,
-    billTo:{
-      clientName:aiData.clientName || "",
-      email:aiData.clientEmail || "",
-      address:aiData.clientAddress || "",
-      phone:"",
-    },
-    items: aiData.items || [{
-      name: "",
-      quantity: 1,
-      unitPrice: 0,
-      taxPercent: 0,
-    }]
-  }));
+  if (aiData) {
+    setFormData((prev) => ({
+      ...prev,
+      billTo: {
+        clientName: aiData.clientName || "",
+        email: aiData.clientEmail || "",
+        address: aiData.clientAddress || "",
+        phone: "",
+      },
+      items:
+        aiData.items || [
+          {
+            name: "",
+            quantity: 1,
+            unitPrice: 0,
+            taxPercent: 0,
+          },
+        ],
+    }));
   }
 
-  if(existingInvoice){
+  if (existingInvoice) {
     setFormData({
       ...existingInvoice,
       invoiceDate: moment(existingInvoice.invoiceDate).format("YYYY-MM-DD"),
       dueDate: moment(existingInvoice.dueDate).format("YYYY-MM-DD"),
     });
-  } else{
+  } else {
     const generateNewInvoiceNumber = async () => {
-      setIsGeneratingNumber
+      setIsGeneratingNumber(true);
       try {
-        const response = await axiosInstance.get(API_PATHS.GET_ALL_INVOICES);
+        const response = await axiosInstance.get(API_PATHS.INVOICE.GET_ALL_INVOICES);
         const invoices = response.data;
         let maxNum = 0;
-        invoices.forEach((inv)=>{
+        invoices.forEach((inv) => {
           const num = parseInt(inv.invoiceNumber.split("-")[1]);
-          if(!isNaN(num) && num > maxNum){
+          if (!isNaN(num) && num > maxNum) {
             maxNum = num;
           }
         });
         const newInvoiceNumber = `INV-${String(maxNum + 1).padStart(3, "0")}`;
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           invoiceNumber: newInvoiceNumber,
         }));
-
-      } catch(error){
-         console.error("Failed to generate invoice number",error);
-         setFormData((prev)=>({...prev,invoiceNumber:`INV-${Date.now().toString().slice(-5)}`}));
+      } catch (error) {
+        console.error("Failed to generate invoice number", error);
+        setFormData((prev) => ({
+          ...prev,
+          invoiceNumber: `INV-${Date.now().toString().slice(-5)}`,
+        }));
       }
       setIsGeneratingNumber(false);
     };
     generateNewInvoiceNumber();
   }
-}
-
-,[existingInvoice]);
+}, [existingInvoice]);
 
 const handleInputChange = (e, section, index) => {
   const { name, value } = e.target;
@@ -132,8 +136,31 @@ const {subtotal, taxTotal, total} = (()=>{
 const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
-}
 
+  const itemsWithTotal = formData.items.map((item)=>({
+    ...item,
+    total: (item.quantity || 0) * (item.unitPrice || 0)*(1 + (item.taxPercent || 0) / 100),
+
+
+  }));
+  const finalFormData ={...formData,items:itemsWithTotal,subtotal,taxTotal,total};
+
+  if(onSave){
+    await onSave(finalFormData);
+  } else{
+    try {
+      await axiosInstance.post(API_PATHS.INVOICE.CREATE,finalFormData);
+      toast.success("Invoice created successfully");
+      navigate("/invoices");
+      
+    } catch (error) {
+      toast.error("Failed to create invoice");
+      console.error("Failed to create invoice",error);
+    } finally{
+      setLoading(false);
+    }
+  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className='space-y-8 pb-[100vh]'>
@@ -150,7 +177,7 @@ const handleSubmit = async (e) => {
           <InputField
             label="Invoice Number"
             name="invoiceNumber"
-            readonly
+            readOnly
 
             value={formData.invoiceNumber}
              placeholder={isGeneratingNumber? "Generating...":""}
@@ -203,23 +230,23 @@ const handleSubmit = async (e) => {
 
             </thead>
             <tbody className='bg-white divide-y divide-slate-200'>
-              {formData.items.map((item,index)=>()=>(
+              {formData.items.map((item, index) => (
                 <tr key={index} className='hover:bg-slate-50'>
                   <td className="px-2 sm:px-6 py-4">
-                    <input type="text" name='' value={item.name} onChange={(e)=>handleInputChange(e,null,index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Item Name'/>
+                    <input type="text" name='name' value={item.name} onChange={(e) => handleInputChange(e, null, index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Item Name'/>
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                    <input type="number" name='' value={item.quantity} onChange={(e)=>handleInputChange(e,null,index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Quantity'/>
+                    <input type="number" name='quantity' value={item.quantity} onChange={(e) => handleInputChange(e, null, index)} className='w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500' placeholder='Quantity'/>
 
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                   <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0.00' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
+                   <input type="number" name='unitPrice' value={item.unitPrice} onChange={(e) => handleInputChange(e, null, index)} placeholder='0.00' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
                   </td>
                   <td className="px-2 sm:px-6 py-4">
-                    <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e)=>handleInputChange(e,null,index)} placeholder='0' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
+                    <input type="number" name='taxPercent' value={item.taxPercent} onChange={(e) => handleInputChange(e, null, index)} placeholder='0' className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"/>
                   </td>
                   <td className="px-2 sm:px-6 py-4 text-sm text-slate-500">
-                    ${((item.quantity || 0) * (item.unitPrice || 0))*(1 + (item.taxPercent || 0) / 100).oFixed(2)}
+                    ${( ((item.quantity || 0) * (item.unitPrice || 0)) * (1 + (item.taxPercent || 0) / 100) ).toFixed(2)}
                   </td>
                   <td className="px-2 sm:px-6 py-4">
                     <Button type="button" variant='ghost' size='small' onClick={()=>handleRemoveItem(index)}><Trash2 className='w-4 h-4 text-red-500'/>
@@ -240,10 +267,8 @@ const handleSubmit = async (e) => {
         <h3 className="text-lg font-semibold text-slate-900 mb-2">Notes and Terms</h3>
         <TextareaField label="Notes" name="notes" value={formData.notes} onChange={handleInputChange}/>
         <SelectField label="Payment Terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleInputChange}
-        options={["Net 15", "Net 30" , "Net 60", "Due on receipt"]}
-        
+          options={["Net 15", "Net 30", "Net 60", "Due on receipt"]}
         />
-        "
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 flex flex-col justify-center ">
         <div className="space-y-4">
@@ -253,11 +278,12 @@ const handleSubmit = async (e) => {
 
         </div>
       </div>
-    </div>
+      </div>
      
     </form>
   )
 
 }
+
 export default CreateInvoice;
 
