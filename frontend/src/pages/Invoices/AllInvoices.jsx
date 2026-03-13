@@ -56,7 +56,33 @@ if(loading){
   </div>
 }
   return (
-    <div>AllInvoices</div>
+    <div className="space-y-6">
+         <CreateWithAIModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
+          <ReminderModal isOpen={isReminderModalOpen} onClose={() => setIsRemindModalOpen(false)} invoiceId={selectedInvoiceId} />
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">All Invoices</h1>
+              <p className="text-sm text-slate-600 mt-1"> Manage all your invoicesin one place.</p>
+            </div>
+            <div className="flex items-center gap-2">
+                 <Button variant='secondary' onClick ={() => setIsModalOpen(true)} icon ={Sparkles}> Create With AI</Button>
+                 <Button onClick={()=> navigate("/invoices/new")} icon={Plus}>Create Invoice</Button>
+
+            </div>
+          </div>
+
+       {error && (
+        <div className="p-4 rounded-lg bg-red-50 border-red-200">
+          <div className="flex items-start">
+            <AlertCircle  className='w-5 h-5 text-red-600 mt-0.5 mr-3'/>
+            <div className="flex-1">
+                  <h3 className="text-sm font-medium text-red-800 mb-1">Error</h3>
+                  <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+       ) }
+    </div>
   )
 }
 
