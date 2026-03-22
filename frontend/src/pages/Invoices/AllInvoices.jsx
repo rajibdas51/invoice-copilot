@@ -3,7 +3,7 @@ import axiosInstance from "../../utils/axiosinstance";
 import { API_PATHS } from '../../utils/apiPaths';
 import {Loader2, Trash2, Edit, Search, FileText, Plus, AlertCircle, Sparkles, Mail} from "lucide-react";
 import moment from "moment";
-import useNavigate from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import CreateWithAIModal from '../../components/invoices/CreateWithAIModal';
 import ReminderModal from '../../components/invoices/ReminderModal';
@@ -51,7 +51,7 @@ const handleDelete = async (id) => {
   const handleStatusChange = async (invoice)=>{
     setStatusChangeLoading(invoice._id);
 try {
-  const newStatus = invoice.status === "Pending" ? "Paid" : "Unpaid";
+ const newStatus = invoice.status === "Paid" ? "Pending" : "Paid";
   const updatedInvoice = {...invoice,status:newStatus};
   const response = await axiosInstance.put(API_PATHS.INVOICE.UPDATE_INVOICE(invoice._id),updatedInvoice);
   setInvoices(invoices.map(inv => inv._id === invoice._id ? response.data : inv));
@@ -147,54 +147,70 @@ if(loading){
             }
           </div>
 ):(
-  <div className="w-[90vw] md:w-auto overflow-x-auto">
-    <table className="min-w-full dividy-y divide-slate-200">
-      <thead className='bg-slate-50'>
-        <tr >
-          <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"> Invoice #</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Client</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>     
-          <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Due Date</th>       
-          <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-          <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody className='bg-white divide-y divide-slate-200'>
-        {filteredInvoices.map((invoice)=>(
-          <tr key={invoice.id} className="hover:bg-slate-50">
-            <td onClick={()=> navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 cursor-pointer">{invoice.invoiceNumber}</td>
-            
-            <td onClick={()=> navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 cursor-pointer">{invoice.billTo.clientName}</td>
-            <td onClick={()=> navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 cursor-pointer">${invoice.total.toFixed(2)}</td>
-            <td onClick={()=> navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 cursor-pointer">{moment(invoice.duDate).format('MMM D, YYYY')}</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === "Pending" ? "bg-amber-100 text-amber-800" : invoice.status === "Paid" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
-                {invoice.status}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium ">
-              <div className="flex items-center justify-end gap-2" onClick={(e)=>e.stopPropagation()}>
-                <Button size='small' variant='secondary' onClick={()=> handleStatusChange(invoice)} isLoading={statusChangeLoading=== invoice._id}>
-                  {invoice.status ==="Paid"? "Mark Unpaid":"Mark Paid"}
-
+<div className="overflow-x-auto border-t border-slate-200">
+ 
+  <table className="w-full table-auto border-collapse">
+    <thead className="bg-slate-50">
+      <tr>
+       
+        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Invoice #</th>
+        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Client</th>
+        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
+        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Due Date</th>
+        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+        <th className="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="bg-white divide-y divide-slate-200">
+      {filteredInvoices.map((invoice) => (
+        <tr key={invoice._id} className="hover:bg-slate-50 transition-colors">
+        
+          <td onClick={() => navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 cursor-pointer">
+            {invoice.invoiceNumber}
+          </td>
+          <td onClick={() => navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 cursor-pointer">
+            {invoice.billTo.clientName}
+          </td>
+          <td onClick={() => navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 cursor-pointer">
+            ${invoice.total.toFixed(2)}
+          </td>
+          <td onClick={() => navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 cursor-pointer">
+            {moment(invoice.dueDate).format("MMM D, YYYY")}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              invoice.status === "Paid" ? "bg-emerald-100 text-emerald-800" : 
+              invoice.status === "Pending" ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800"
+            }`}>
+              {invoice.status}
+            </span>
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+              <Button size="small" variant="secondary" onClick={() => handleStatusChange(invoice)} isLoading={statusChangeLoading === invoice._id}>
+             mark   {invoice.status === "Paid" ? "Unpaid" : "Paid"}
+              </Button>
+              <Button size="small" variant="ghost" onClick={() => navigate(`/invoices/${invoice._id}`)}>
+                <Edit className="w-4 h-4 text-slate-500" />
+              </Button>
+              <Button size="small" variant="ghost" onClick={() => handleDelete(invoice._id)}>
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </Button>
+              {invoice.status !== "Paid" && (
+                <Button size="small" variant="ghost" onClick={() => handleOpenReminderModal(invoice._id)}>
+                  <Mail className="w-4 h-4 text-blue-500" />
                 </Button>
-                
-                 <Button size='small' variant='ghost' onClick={()=>navigate(`/invoices/${invoice._id}`)}><Edit className='w-4 h-4 text-blue-500'/></Button>
-                    <Button size='small' variant='ghost' onClick={()=>handleDelete(invoice._id)}><Trash2 className='w-4 h-4 text-red-500'/></Button>
-                    {invoice.status !=="Paid" && (
-                      <Button size='small' variant='ghost' onClick={()=>handleOpenReminderModal(invoice._id)} title="Generate Reminder"><Mail className='w-4 h-4 text-blue-500'/></Button>
-                    )}
-              </div>
-            </td>
-
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              )}
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 </div>
 )}
-       </div>
-    </div>
+ </div>
+ </div>
   )
 }
 
