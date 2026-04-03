@@ -16,20 +16,20 @@ const[isLoading,setIsLoading] = useState(false);
   
  };
   return (
-    <div className=''>
-      <div className="">
-        <div className="" onClick={onclose}></div>
+    <div className='fixed inset-0 z-50 overflow-y-auto '>
+      <div className="flex items-center justify-center min-h-screen px-4 text-center">
+        <div className="fixed inset-0 bg-black/10 bg-opacity-50 transition-opacity" onClick={onclose}></div>
         
-        <div className="">
-          <div className="">
-            <h3 className=''>
-              <Sparkles className='inline mr-2' size={20}/>
+        <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative  text-left transform transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className='text-lg font-semibold flex items-center text-slate-900'>
+              <Sparkles className='w-5 h-5 mr-2 text-blue-600' size={20}/>
               Create Invoice with AI
             </h3>
-            <button onClick={onclose} className="">&times;</button>
+            <button onClick={onclose} className="text-slate-400 hover:text-slate-600">&times;</button>
           </div>
-          <div className="">
-            <p className="">
+          <div className="space-y-4 ">
+            <p className="text-sm text-slate-600">
               Paste any text that contains invoice details (like client name, items, quantitities,and prices) and the AI will attempt to create an invoice for you. The more details you provide, the better the AI can generate an accurate invoice.
             </p>
             <TextareaField
@@ -41,7 +41,7 @@ const[isLoading,setIsLoading] = useState(false);
               rows={8}
             />
           </div>
-          <div className="">
+          <div className="flex  justify-end mt-6 space-x-3">
              <button variant="secondary" onClick={onClose}>Cancel</button>
              <Button onClick={handleGenerate} disabled={isLoading}>
               {isLoading ? 'Generating...' : 'Generate Invoice'}
