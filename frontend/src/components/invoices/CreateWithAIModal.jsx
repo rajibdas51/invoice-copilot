@@ -7,7 +7,7 @@ import { API_PATHS } from '../../utils/apiPaths';
 import toast  from 'react-hot-toast';
 import {useNavigate} from 'react-router-dom';
 
-const CreateWithAIModal = () => {
+const CreateWithAIModal = ({isOpen,onClose}) => {
  const [text,setText] = useState('');
 const[isLoading,setIsLoading] = useState(false);
  const navigate = useNavigate();
@@ -34,6 +34,8 @@ const[isLoading,setIsLoading] = useState(false);
     }
   
  };
+
+ if(!isOpen) return null;
   return (
     <div className='fixed inset-0 z-50 overflow-y-auto '>
       <div className="flex items-center justify-center min-h-screen px-4 text-center">
