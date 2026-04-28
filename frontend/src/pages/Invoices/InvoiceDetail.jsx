@@ -117,12 +117,15 @@ useEffect(() => {
      
     </div>
    </div>
+
+
    <div id='invoice-content-wrapper'>
-       <div className="" ref={invoiceRef} id='invoice-preview'>
-          <div className="">
+       <div className= "pb-[100vh] bg-white p-6 sm:p-8 md:p-12 rounded-lg shadow-md border border-slate-200 " ref={invoiceRef} id='invoice-preview'>
+        
+          <div className="flex flex-col sm:flex-row justify-between items-start pb-8 border-b border-slate-200">
             <div className="">
-              <h2 className="">INVOICE</h2>
-              <p className="">#{invoice.invoiceNumber}</p>
+              <h2 className="text-3xl font-bold text-slate-900 ">INVOICE</h2>
+              <p className="text-sm text-slate-500">#{invoice.invoiceNumber}</p>
             </div>
             <div className="">
               <p className="">Status</p>
@@ -133,23 +136,63 @@ useEffect(() => {
             </div>
           </div>
 
-          <div className="">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 my-8">
              <div>
-              <h3 className="">Bill From</h3>
-              <p className="">{invoice.billFrom.businessName}</p>
-              <p className="">{invoice.billFrom.email}</p>
-              <p className="">{invoice.billFrom.address}</p>
-              <p className="">{invoice.billFrom.phone}</p>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Bill From</h3>
+              <p className="font-semibold text-slate-800">{invoice.billFrom.businessName}</p>
+              <p className="text-slate-600">{invoice.billFrom.email}</p>
+              <p className="text-slate-600">{invoice.billFrom.address}</p>
+              <p className="text-slate-600">{invoice.billFrom.phone}</p>
 
              </div>
-             <div className="">
-              <h3 className="">Bill To</h3>
-              <p className="">{invoice.billTo.clientName}</p>
-              <p className="">{invoice.billTo.email}</p>
-              <p className="">{invoice.billTo.address}</p>
-              <p className="">{invoice.billTo.phone}</p>
+             <div className="sm:text-right">
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Bill To</h3>
+              <p className="font-semibold text-slate-800">{invoice.billTo.clientName}</p>
+              <p className="text-slate-600">{invoice.billTo.email}</p>
+              <p className="text-slate-600">{invoice.billTo.address}</p>
+              <p className="text-slate-600">{invoice.billTo.phone}</p>
              </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 my-8">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Invoice Date</h3>
+              <p className='font-medium text-slate-800'>{new Date(invoice.invoiceDate).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Due Date</h3>
+              <p className='font-medium text-slate-800'>{new Date(invoice.dueDate).toLocaleDateString()}</p>
+          
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Payment Terms</h3>
+              <p className='font-medium text-slate-800'>{invoice.paymentTerms}</p>
+            </div>
+
+          </div>
+          <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+            <table className="w-full divide-y divide-slate-200">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Item</th>
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Qty</th>
+                  <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+                  <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Total</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-slate-200">
+                {invoice.items.map((item, index) => (
+                  <tr key={index}>
+                      <td className="px-4 sm:px-6 py-4 text-sm font-medium text-slate-900">{item.name}</td>
+                      <td className="px-4 sm:px-6 py-4 text-center text-sm font-medium text-slate-600">{item.quantity}</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-right font-medium text-slate-600">${item.uniPrice.toFixed(2)}</td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-right font-medium text-slate-900">${item.total.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
        </div>
    </div>
 
