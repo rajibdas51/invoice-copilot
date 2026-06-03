@@ -1,6 +1,61 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import Invoice from "../models/Invoice.js";
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// ─── Gemini REST API Setup ────────────────────────────────────
+const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+async function callGemini(prompt, responseMimeType = null) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey)
+    throw new Error("GEMINI_API_KEY is not set in environment variables");
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 8192,
+      topP: 0.95,
+      ...(responseMimeType && { responseMimeType }),
+    },
+  };
+
+  const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.error("Gemini API Error:", err);
+    throw new Error(err?.error?.message ?? `Gemini API error: ${res.status}`);
+  }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  if (!text) throw new Error("Empty response from Gemini");
+  return text.trim();
+}
+
+// Strips markdown fences and extracts the outermost JSON object
+function extractJSON(raw) {
+  const stripped = raw
+    .replace(/```(?:json)?\s*/gi, "")
+    .replace(/```/g, "")
+    .trim();
+  const start = stripped.indexOf("{");
+  const end = stripped.lastIndexOf("}");
+  if (start === -1 || end === -1 || end < start) {
+    console.error(
+      "Could not extract JSON from Gemini response:",
+      stripped.slice(0, 300),
+    );
+    throw new Error("Could not extract valid JSON from Gemini response");
+  }
+  return stripped.slice(start, end + 1);
+}
+
+// ─── Controllers ─────────────────────────────────────────────
 
 const parseInvoiceFromText = async (req, res) => {
   const { text } = req.body;
@@ -33,17 +88,8 @@ const parseInvoiceFromText = async (req, res) => {
     Extract the data and provide ONLY the JSON object as output without any additional text or explanation.
     `;
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
-
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-
-    const parsedData = JSON.parse(responseText);
+    const responseText = await callGemini(prompt, "application/json");
+    const parsedData = JSON.parse(extractJSON(responseText));
 
     res.status(200).json(parsedData);
   } catch (error) {
@@ -77,12 +123,8 @@ const generateReminderEmail = async (req, res) => {
     The tone should be friendly and professional but clear. Keep the email concise and to the point. Start the email with "Subject:"
 
     `;
-    // initialize the model and generate the content
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-    });
-    const result = await model.generateContent(prompt);
-    const response = await result.response.text();
+
+    const response = await callGemini(prompt);
     res.status(200).json({ emailContent: response });
   } catch (error) {
     console.error("Error generating reminder email with AI:", error);
@@ -140,16 +182,8 @@ const getDashboardSummary = async (req, res) => {
   
     `;
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
-    const result = await model.generateContent(prompt);
-    const responseText = await result.response.text();
-
-    const parsedInsights = JSON.parse(responseText);
+    const responseText = await callGemini(prompt, "application/json");
+    const parsedInsights = JSON.parse(extractJSON(responseText));
 
     res.status(200).json({ insights: parsedInsights.insights });
   } catch (error) {
