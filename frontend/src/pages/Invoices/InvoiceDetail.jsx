@@ -129,7 +129,7 @@ const InvoiceDetail = () => {
 
       <div id="invoice-content-wrapper">
         <div
-          className="pb-[100vh] bg-white p-6 sm:p-8 md:p-12 rounded-lg shadow-md border border-slate-200 "
+          className=" bg-white p-6 sm:p-8 md:p-12 rounded-lg shadow-md border border-slate-200 "
           ref={invoiceRef}
           id="invoice-preview"
         >
