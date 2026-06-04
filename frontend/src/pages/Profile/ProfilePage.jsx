@@ -9,8 +9,8 @@ import TextareaField from "../../components/ui/TextareaField";
 
 const ProfilePage = () => {
   const { user, loading, updateUser } = useAuth();
-  const { isUpdating, setIsUpdating } = useState(false);
-  const { formData, setFormData } = useState({
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [formData, setFormData] = useState({
     name: "",
     businessName: "",
     email: "",
@@ -34,8 +34,21 @@ const ProfilePage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdateProfile = async () => {
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
     setIsUpdating(true);
+    try {
+      const response = await axisosInstance.put(
+        API_PATHS.AUTH.UPDATE_PROFILE,
+        formData,
+      );
+      await updateUser(formData);
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (loading) {
@@ -125,7 +138,7 @@ const ProfilePage = () => {
         <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
           <button
             type="submit"
-            className="inline-flex items-center justify-center px-4 py-2 h-10 bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled: opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center px-4 py-2 h-10 !bg-blue-500 hover:!bg-blue-600 text-white font-medium rounded-lg  transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isUpdating}
           >
             {isUpdating ? (
