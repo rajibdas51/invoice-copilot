@@ -61,6 +61,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/invoices", invoiceRouter);
 app.use("/api/ai", aiRouter);
 app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
+app.get("/", (req, res) =>
+  res.status(200).json({ status: "server is running" }),
+);
 // Error handler
 app.use(errorHandler);
 
