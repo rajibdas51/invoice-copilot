@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Loader2, User, Mail, Building, Phone, MapPin } from "lucide-react";
-import axisosInstance from "../../utils/axiosinstance";
+import axiosInstance from "../../utils/axiosinstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import InputField from "../../components/ui/InputField";
