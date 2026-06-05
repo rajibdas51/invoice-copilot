@@ -53,7 +53,7 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center w-8  h-8 animate-spin">
+      <div className="flex justify-center w-8  h-8 ">
         {" "}
         <Loader2 className="animate-spin" />{" "}
       </div>
