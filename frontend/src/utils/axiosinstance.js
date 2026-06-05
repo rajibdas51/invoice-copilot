@@ -34,7 +34,9 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const isAuthRoute =
         error.config.url.includes("/api/auth/login") ||
-        error.config.url.includes("/api/auth/register");
+        error.config.url.includes("/api/auth/register") ||
+        error.config.url.includes("/api/auth/forgot-password") ||
+        error.config.url.includes("/api/auth/reset-password");
 
       // Don't auto-logout if it's a login/register failure
       if (!isAuthRoute) {

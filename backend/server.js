@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "path";
 import morgan from "morgan";
 
+import passport from "./config/passport.js";
 import { ConnectDB } from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import invoiceRouter from "./routes/invoiceRoutes.js";
@@ -21,6 +22,8 @@ ConnectDB();
 // Middleware to parse JSON and URL-encoded requests (BEFORE CORS)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+
 // Use morgan middleware
 app.use(morgan("dev"));
 // Middleware to handle CORS (AFTER body parsers)
