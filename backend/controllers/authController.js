@@ -254,4 +254,6 @@ export {
   updateUserProfile,
   forgotPassword,
   resetPassword,
+  googleAuth,
+  googleCallback,
 };

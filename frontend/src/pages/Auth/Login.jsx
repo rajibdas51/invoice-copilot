@@ -221,7 +221,7 @@ const Login = () => {
           <button
             onClick={handleSubmit}
             disabled={isLoading || !isFormValid()}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors  disabled:cursor-not-allowed mt-2"
           >
             {isLoading ? (
               <>
