@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
+import passport from "../config/passport.js";
 // Helper: Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -220,6 +221,30 @@ const resetPassword = async (req, res) => {
     name: user.name,
     email: user.email,
   });
+};
+
+// @route GET /api/auth/google
+const googleAuth = passport.authenticate("google", {
+  scope: ["profile", "email"],
+  session: false,
+});
+
+// @route GET /api/auth/google/callback
+const googleCallback = (req, res) => {
+  passport.authenticate("google", { session: false }, (err, user) => {
+    if (err || !user) {
+      return res.redirect(
+        `${process.env.CLIENT_URL}/login?error=google_auth_failed`,
+      );
+    }
+
+    const token = generateToken(user._id);
+
+    // Send token + user data back to frontend via URL params
+    res.redirect(
+      `${process.env.CLIENT_URL}/auth/callback?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&id=${user._id}`,
+    );
+  })(req, res);
 };
 
 export {
