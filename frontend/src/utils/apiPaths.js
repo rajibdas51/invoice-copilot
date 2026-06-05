@@ -2,10 +2,13 @@ export const BASE_URL = "http://localhost:8000";
 
 export const API_PATHS = {
   AUTH: {
-    REGISTER: "/api/auth/register", // Sign up
-    LOGIN: "/api/auth/login", // Authenticate user and return JWT token
-    GET_PROFILE: "/api/auth/me", // Get logged-in user profile
-    UPDATE_PROFILE: "/api/auth/me", // Update user profile
+    REGISTER: "/api/auth/register",
+    LOGIN: "/api/auth/login",
+    GET_PROFILE: "/api/auth/me",
+    UPDATE_PROFILE: "/api/auth/me",
+    FORGOT_PASSWORD: "/api/auth/forgot-password",
+    RESET_PASSWORD: (token) => `/api/auth/reset-password/${token}`,
+    GOOGLE_LOGIN: `${BASE_URL}/api/auth/google`,
   },
   INVOICE: {
     CREATE: "/api/invoices", // Create a new invoice
