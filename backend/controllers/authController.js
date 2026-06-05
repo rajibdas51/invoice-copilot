@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
 // Helper: Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -123,4 +124,109 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getMe, updateUserProfile };
+// @desc   Forgot password — send reset email
+// @route  POST /api/auth/forgot-password
+// @access Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  // Always return same message to prevent email enumeration attacks
+  if (!user) {
+    return res
+      .status(200)
+      .json({ message: "If that email exists, a reset link has been sent." });
+  }
+
+  // Block Google-only accounts
+  if (user.authProvider === "google" && !user.password) {
+    return res.status(400).json({
+      message: "This account uses Google login. Please sign in with Google.",
+    });
+  }
+
+  const rawToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${rawToken}`;
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: auto; padding: 24px;">
+      <h2 style="color: #1e40af;">Reset Your Password</h2>
+      <p>You requested a password reset for your Invoice Copilot account.</p>
+      <p>Click the button below — this link expires in <strong>15 minutes</strong>.</p>
+      <a href="${resetUrl}"
+         style="display:inline-block; padding:12px 24px; background:#2563eb; color:white;
+                border-radius:8px; text-decoration:none; font-weight:600; margin:16px 0;">
+        Reset Password
+      </a>
+      <p style="color:#888; font-size:13px; margin-top:24px;">
+        If you didn't request this, you can safely ignore this email.
+      </p>
+    </div>
+  `;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset — Invoice Copilot",
+      html,
+    });
+    res
+      .status(200)
+      .json({ message: "If that email exists, a reset link has been sent." });
+  } catch (err) {
+    // Clean up so user can try again
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    res
+      .status(500)
+      .json({ message: "Email could not be sent. Please try again." });
+  }
+};
+
+// @desc   Reset password using token from email
+// @route  PUT /api/auth/reset-password/:token
+// @access Public
+const resetPassword = async (req, res) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() }, // not expired
+  }).select("+resetPasswordToken +resetPasswordExpire");
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ message: "Reset link is invalid or has expired." });
+  }
+
+  user.password = req.body.password; // pre-save hook hashes it
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  const token = generateToken(user._id);
+  res.status(200).json({
+    message: "Password reset successful.",
+    token,
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+  });
+};
+
+export {
+  registerUser,
+  loginUser,
+  getMe,
+  updateUserProfile,
+  forgotPassword,
+  resetPassword,
+};
