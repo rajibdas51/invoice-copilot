@@ -17,11 +17,14 @@ import InvoiceDetail from "./pages/Invoices/InvoiceDetail";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import GoogleCallback from "./pages/Auth/GoogleCallback";
+import { useLocation } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./components/auth/PublicRoute";
 
 const App = () => {
+  const location = useLocation();
+
   return (
     <AuthProvider>
       <Router>
@@ -57,7 +60,10 @@ const App = () => {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="invoices" element={<AllInvoices />} />
-            <Route path="invoices/new" element={<CreateInvoice />} />
+            <Route
+              path="/invoices/new"
+              element={<CreateInvoice key={location.key} />}
+            />
             <Route path="invoices/:id" element={<InvoiceDetail />} />
           </Route>
           {/* Catch all  Routes */}
