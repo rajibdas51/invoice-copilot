@@ -11,7 +11,7 @@ import InputField from "../../components/ui/InputField";
 import SelectField from "../../components/ui/SelectField";
 import TextareaField from "../../components/ui/TextareaField";
 import Button from "../../components/ui/Button";
-import CreateWithAIModal from "../../components/modals/CreateWithAIModal";
+import CreateWithAIModal from "../../components/invoices/CreateWithAIModal";
 
 const EMPTY_ITEM = { name: "", quantity: 1, unitPrice: 0, taxPercent: 0 };
 
