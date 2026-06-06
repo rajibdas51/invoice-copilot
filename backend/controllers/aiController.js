@@ -65,28 +65,47 @@ const parseInvoiceFromText = async (req, res) => {
   }
 
   try {
-    const prompt = `you are an expert at invoice data extraction. Analyze the following text and extract the relevant information to create an invoice. The output MUST be a valid JSON object
-    
-    The JSON object should have the following structure:
-    { 
-    "clientName":"string",
-    "email":"string",
-    "address":"string",
-    "items":[
-          {
-             "name":"string",
-             "quantity":number,
-             "unitPrice":number}
-    ]
+    const prompt = `You are an expert at invoice data extraction. Analyze the following text and extract ALL relevant information to create an invoice.
+
+The output MUST be a valid JSON object with this exact structure:
+{
+  "clientName": "string",
+  "email": "string",
+  "address": "string",
+  "phone": "string",
+  "notes": "string",
+  "paymentTerms": "string",
+  "items": [
+    {
+      "name": "string",
+      "quantity": number,
+      "unitPrice": number,
+      "taxPercent": number
     }
+  ]
+}
 
-    here is the text to parse:
-    --- TEXT START ---
-    ${text}
-    --- TEXT END ---
+Extraction rules:
+- "clientName": the client or company name being billed
+- "email": client email address
+- "address": client address
+- "phone": client phone number (empty string if not found)
+- "notes": any notes, thank you messages, or additional remarks
+- "paymentTerms": payment terms like "Net 15", "Net 30", "Due on receipt", or whatever is mentioned — default to "Net 15" if unclear
+- "items": each line item with:
+    - "name": item/service description
+    - "quantity": numeric quantity (default 1 if not specified)
+    - "unitPrice": price per unit BEFORE tax (not the total)
+    - "taxPercent": tax percentage as a number e.g. 10 for 10% (default 0 if not mentioned)
+- Always return empty string "" for missing text fields, and 0 for missing numbers
+- Never include subtotal, taxTotal, or grand total in the output — those are calculated automatically
 
-    Extract the data and provide ONLY the JSON object as output without any additional text or explanation.
-    `;
+Here is the text to parse:
+--- TEXT START ---
+${text}
+--- TEXT END ---
+
+Return ONLY the JSON object. No explanation, no markdown, no extra text.`;
 
     const responseText = await callGemini(prompt, "application/json");
     const parsedData = JSON.parse(extractJSON(responseText));
@@ -94,7 +113,6 @@ const parseInvoiceFromText = async (req, res) => {
     res.status(200).json(parsedData);
   } catch (error) {
     console.error("Error details:", error);
-    console.error("Error message:", error.message);
     res.status(500);
     throw new Error("Failed to parse invoice data from text");
   }

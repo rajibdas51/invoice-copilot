@@ -46,21 +46,24 @@ const CreateInvoice = ({ existingInvoice, onSave }) => {
   // ── On mount: handle AI pre-fill or edit mode ─────────────
   useEffect(() => {
     const aiData = location.state?.aiData;
+    // Replace the aiData block inside your useEffect in CreateInvoice.jsx
 
     if (aiData) {
       setFormData((prev) => ({
         ...prev,
+        notes: aiData.notes || "",
+        paymentTerms: aiData.paymentTerms || "Net 15",
         billTo: {
           clientName: aiData.clientName || "",
           email: aiData.email || "",
           address: aiData.address || "",
-          phone: "",
+          phone: aiData.phone || "",
         },
         items: aiData.items?.map((item) => ({
           name: item.name || "",
           quantity: item.quantity || 1,
           unitPrice: item.unitPrice || 0,
-          taxPercent: 0,
+          taxPercent: item.taxPercent || 0,
         })) || [{ ...EMPTY_ITEM }],
       }));
     }
