@@ -7,7 +7,6 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-// Check browser support once at module level
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 const isSpeechSupported = !!SpeechRecognition;
@@ -24,37 +23,45 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
   const [transcript, setTranscript] = useState("");
   const [interimText, setInterimText] = useState("");
 
+  // Refs so event handlers always have the latest values
   const recognitionRef = useRef(null);
+  const isListeningRef = useRef(false); // tracks USER intent (did they click stop?)
+  const transcriptRef = useRef(""); // latest committed transcript
 
-  // Cleanup on unmount or close
+  // Keep transcriptRef in sync with state
   useEffect(() => {
-    return () => stopListening();
-  }, []);
+    transcriptRef.current = transcript;
+  }, [transcript]);
 
+  // Stop when modal closes
   useEffect(() => {
-    if (!isOpen) stopListening();
+    if (!isOpen) hardStop();
   }, [isOpen]);
 
-  // ── Speech Recognition ────────────────────────────────────
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => hardStop();
+  }, []);
 
-  const startListening = () => {
-    if (!isSpeechSupported) {
-      toast.error(
-        "Speech recognition is not supported in your browser. Try Chrome.",
-      );
-      return;
-    }
+  // ── Recognition ─────────────────────────────────────────
+
+  const createRecognition = () => {
+    if (!isSpeechSupported) return null;
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.continuous = true; // don't stop on short pauses
+    recognition.interimResults = true; // show words as they're spoken
     recognition.lang = "en-US";
+    recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => setIsListening(true);
+    recognition.onstart = () => {
+      setIsListening(true);
+      isListeningRef.current = true;
+    };
 
     recognition.onresult = (event) => {
       let interim = "";
-      let final = transcript; // build on existing transcript
+      let final = transcriptRef.current;
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
@@ -65,48 +72,78 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
         }
       }
 
+      transcriptRef.current = final;
       setTranscript(final);
       setInterimText(interim);
     };
 
     recognition.onerror = (event) => {
-      if (event.error !== "aborted") {
-        toast.error(`Microphone error: ${event.error}`);
-      }
-      setIsListening(false);
-      setInterimText("");
+      // These are expected during auto-restart — ignore them
+      if (event.error === "no-speech" || event.error === "aborted") return;
+      toast.error(`Microphone error: ${event.error}`);
+      hardStop();
     };
 
     recognition.onend = () => {
-      setIsListening(false);
       setInterimText("");
+      // Auto-restart if user hasn't clicked stop
+      if (isListeningRef.current) {
+        try {
+          const next = createRecognition();
+          recognitionRef.current = next;
+          next?.start();
+        } catch {
+          // already started — ignore
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
-    recognitionRef.current = recognition;
-    recognition.start();
+    return recognition;
   };
 
-  const stopListening = () => {
+  // Fully stop — sets intent flag so onEnd doesn't restart
+  const hardStop = () => {
+    isListeningRef.current = false;
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     setIsListening(false);
     setInterimText("");
   };
 
+  const startListening = () => {
+    if (!isSpeechSupported) {
+      toast.error(
+        "Speech recognition isn't supported in your browser. Please use Chrome.",
+      );
+      return;
+    }
+    isListeningRef.current = true;
+    const recognition = createRecognition();
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      toast.error("Could not access microphone. Please try again.");
+      hardStop();
+    }
+  };
+
   const toggleListening = () => {
-    isListening ? stopListening() : startListening();
+    isListening ? hardStop() : startListening();
   };
 
   const clearSpeech = () => {
-    stopListening();
+    hardStop();
     setTranscript("");
+    transcriptRef.current = "";
     setInterimText("");
   };
 
-  // The text we actually send to AI — either typed or spoken
-  const activeText = mode === MODES.TEXT ? text : transcript;
+  // ── Generate ─────────────────────────────────────────────
 
-  // ── Generate Invoice ──────────────────────────────────────
+  const activeText = mode === MODES.TEXT ? text : transcript;
 
   const handleGenerate = async () => {
     if (!activeText.trim()) {
@@ -136,9 +173,11 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
   };
 
   const handleModeSwitch = (newMode) => {
-    stopListening();
+    hardStop();
     setMode(newMode);
   };
+
+  // ── Render ───────────────────────────────────────────────
 
   if (!isOpen) return null;
 
@@ -192,7 +231,9 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
               <Mic className="w-4 h-4" />
               Speak
               {!isSpeechSupported && (
-                <span className="text-xs text-slate-400">(not supported)</span>
+                <span className="text-xs text-slate-400 ml-1">
+                  (not supported)
+                </span>
               )}
             </button>
           </div>
@@ -201,10 +242,10 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
           <p className="text-sm text-slate-500 mb-4">
             {mode === MODES.TEXT
               ? "Describe your invoice in plain text — client name, items, quantities, and prices. The AI will extract and fill the form for you."
-              : "Click the microphone and speak your invoice details. The AI will extract and fill the form for you."}
+              : "Click the microphone and speak naturally. Pause as long as you need — recording continues until you click stop."}
           </p>
 
-          {/* ── TEXT MODE ── */}
+          {/* TEXT MODE */}
           {mode === MODES.TEXT && (
             <TextareaField
               name="invoiceText"
@@ -216,10 +257,10 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
             />
           )}
 
-          {/* ── SPEECH MODE ── */}
+          {/* SPEECH MODE */}
           {mode === MODES.SPEECH && (
             <div className="space-y-3">
-              {/* Mic Button */}
+              {/* Mic button */}
               <div className="flex flex-col items-center justify-center py-4 gap-3">
                 <button
                   onClick={toggleListening}
@@ -235,10 +276,11 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
                     <Mic className="w-7 h-7 text-white" />
                   )}
                 </button>
+
                 <p className="text-sm text-slate-500">
                   {isListening ? (
                     <span className="text-red-500 font-medium">
-                      Listening... click to stop
+                      Recording — click to stop
                     </span>
                   ) : transcript ? (
                     "Click to continue recording"
@@ -246,10 +288,24 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
                     "Click the mic to start speaking"
                   )}
                 </p>
+
+                {/* Animated dots while recording */}
+                {isListening && (
+                  <div className="flex items-center gap-1.5">
+                    {[0, 150, 300].map((delay) => (
+                      <span
+                        key={delay}
+                        className="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce"
+                        style={{ animationDelay: `${delay}ms` }}
+                      />
+                    ))}
+                    <span className="text-xs text-red-500 ml-1">Live</span>
+                  </div>
+                )}
               </div>
 
-              {/* Transcript Display */}
-              <div className="relative min-h-[120px] max-h-[180px] overflow-y-auto p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 leading-relaxed">
+              {/* Transcript display */}
+              <div className="min-h-[120px] max-h-[200px] overflow-y-auto p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 leading-relaxed">
                 {transcript || interimText ? (
                   <>
                     <span>{transcript}</span>
@@ -266,14 +322,20 @@ const CreateWithAIModal = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Clear button */}
+              {/* Word count + clear */}
               {transcript && (
-                <button
-                  onClick={clearSpeech}
-                  className="text-xs text-slate-400 hover:text-red-500 transition-colors"
-                >
-                  Clear transcript
-                </button>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">
+                    {transcript.trim().split(/\s+/).filter(Boolean).length}{" "}
+                    words recorded
+                  </span>
+                  <button
+                    onClick={clearSpeech}
+                    className="text-xs text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
               )}
             </div>
           )}
