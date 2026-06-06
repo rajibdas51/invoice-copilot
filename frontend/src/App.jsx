@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import LandingPage from "./pages/LandingPage/LandingPage";
@@ -17,66 +18,64 @@ import InvoiceDetail from "./pages/Invoices/InvoiceDetail";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import GoogleCallback from "./pages/Auth/GoogleCallback";
-import { useLocation } from "react-router-dom";
-
 import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./components/auth/PublicRoute";
 
-const App = () => {
+// ← separate component so useLocation runs INSIDE <Router>
+const AppRoutes = () => {
   const location = useLocation();
 
   return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <SignUp />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/auth/callback" element={<GoogleCallback />} />
+
+      {/* Protected Routes */}
+      <Route path="/" element={<ProtectedRoute />}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="invoices" element={<AllInvoices />} />
+        <Route
+          path="/invoices/new"
+          element={<CreateInvoice key={location.key} />} // ← key works now
+        />
+        <Route path="invoices/:id" element={<InvoiceDetail />} />
+      </Route>
+
+      {/* Catch all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+const App = () => {
+  return (
     <AuthProvider>
       <Router>
-        <Routes>
-          {/* public Routes*/}
-
-          <Route path="/" element={<LandingPage />} />
-
-          <Route
-            path="/signup"
-            element={
-              <PublicRoute>
-                <SignUp />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/auth/callback" element={<GoogleCallback />} />
-
-          {/* Protected  Routes */}
-
-          <Route path="/" element={<ProtectedRoute />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="invoices" element={<AllInvoices />} />
-            <Route
-              path="/invoices/new"
-              element={<CreateInvoice key={location.key} />}
-            />
-            <Route path="invoices/:id" element={<InvoiceDetail />} />
-          </Route>
-          {/* Catch all  Routes */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppRoutes /> {/* ← useLocation is now inside <Router> */}
       </Router>
-
       <Toaster
         toastOptions={{
-          className: "",
-          style: {
-            fontSize: "13px",
-          },
+          style: { fontSize: "13px" },
         }}
       />
     </AuthProvider>
